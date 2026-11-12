@@ -1,0 +1,8 @@
+[theme]
+base = "light"
+primaryColor = "#FE6574"
+font = "sans serif"
+
+[client]
+toolbarMode = "minimal"
+showSidebarNavigation = false
