@@ -18,6 +18,13 @@ def toggle_mono() -> None:
 
 def navbar(pages, current) -> None:
     """상단 고정 유리 내비게이션 바 + 우측 monochrome 버튼"""
+    # 현재 페이지 강조 스타일은 바 '밖'에서 한 번만 넣어요. (바 안에 넣으면 그 칸만 위로 밀려 올라감)
+    active = next((i for i, p in enumerate(pages) if p.title == current.title), 0)
+    render(
+        f"<style>.st-key-nav_{active} a{{background:var(--glass-strong)!important;"
+        f"box-shadow:inset 0 1px 0 var(--glass-highlight);}}"
+        f".st-key-nav_{active} a p{{color:var(--text)!important;}}</style>"
+    )
     with st.container(key="navbar"):
         cols = st.columns([2.4, 0.9, 1.05, 0.9, 0.95, 1.05, 1.8], vertical_alignment="center")
         with cols[0]:
@@ -29,12 +36,6 @@ def navbar(pages, current) -> None:
             with col:
                 with st.container(key=f"nav_{i}"):
                     st.page_link(page, label=page.title)
-                if page.title == current.title:  # 현재 페이지 강조
-                    render(
-                        f"<style>.st-key-nav_{i} a{{background:var(--glass-strong)!important;"
-                        f"box-shadow:inset 0 1px 0 var(--glass-highlight);}}"
-                        f".st-key-nav_{i} a p{{color:var(--text)!important;}}</style>"
-                    )
         with cols[6]:
             st.button("monochrome", key="mono_btn", on_click=toggle_mono)
 
@@ -80,7 +81,7 @@ def footer() -> None:
     render(
         """
         <div class="foot mm">
-          <div>PRISM — Investment Simulator<br>Every decision leaves a lesson.</div>
+          <div><span class="foot-title">PRISM — Investment Simulator</span><br>Every decision leaves a lesson.</div>
           <div>모든 기업·시장·뉴스는 교육용으로 만든 가상의 시나리오입니다.<br>
           실제 투자 권유나 조언이 아닙니다.</div>
         </div>
