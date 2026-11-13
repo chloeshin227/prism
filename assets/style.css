@@ -25,7 +25,7 @@ html, body, .stApp { background: var(--bg) !important; }
   font-family: var(--font) !important;
 }
 .stApp p, .stApp li, .stApp label { color: var(--text); font-weight: 500; }
-.mm, .mm * { word-break: keep-all; }
+.mm, .mm * { word-break: keep-all; text-wrap: pretty; }
 .num { font-variant-numeric: tabular-nums; }
 ::selection { background: var(--accent); color: var(--on-accent); }
 
@@ -80,7 +80,17 @@ html, body, .stApp { background: var(--bg) !important; }
   transition: background .7s var(--ease);
 }
 .st-key-navbar [data-testid="stHorizontalBlock"] { gap: .25rem; align-items: center; }
-.brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.05rem; letter-spacing: .06em; color: var(--text); white-space: nowrap; }
+/* 바 안의 모든 칸을 같은 높이·같은 줄에 정렬 */
+.st-key-navbar [data-testid="stColumn"] { display: flex; align-items: center; justify-content: center; }
+.st-key-navbar [data-testid="stColumn"]:first-child { justify-content: flex-start; }
+.st-key-navbar [data-testid="stColumn"]:last-child { justify-content: flex-end; }
+.st-key-navbar [data-testid="stVerticalBlock"] { gap: 0 !important; justify-content: center; }
+.st-key-navbar [data-testid="stElementContainer"], .st-key-navbar [data-testid="stMarkdownContainer"] { margin: 0 !important; }
+.st-key-navbar [data-testid="stPageLink"] a { display: flex; align-items: center; height: 38px; }
+.st-key-navbar [data-testid="stPageLink"] a p { margin: 0 !important; line-height: 1 !important; }
+/* <style>만 들어 있는 빈 칸은 숨기기 (스타일 자체는 그대로 적용됨) */
+[data-testid="stElementContainer"]:has(style) { display: none !important; }
+.brand { display: flex; align-items: center; height: 38px; line-height: 1; gap: 10px; font-weight: 800; font-size: 1.05rem; letter-spacing: .06em; color: var(--text); white-space: nowrap; }
 .brand-mark { width: 14px; height: 14px; border-radius: 4px; transform: rotate(45deg); background: conic-gradient(from 200deg, var(--irid-1), var(--accent), var(--irid-4), var(--neon), var(--irid-1)); box-shadow: 0 0 16px var(--accent-soft); }
 .brand-sub { font-weight: 600; color: var(--muted); font-size: .82rem; letter-spacing: 0; }
 
@@ -140,7 +150,8 @@ html, body, .stApp { background: var(--bg) !important; }
 .st-key-commit button, .st-key-grade button { width: 100%; }
 
 /* CTA 링크 버튼 (네오 브루탈) */
-.st-key-hero_cta, .st-key-end_cta { display: flex; justify-content: center; }
+.st-key-hero_cta, .st-key-end_cta { display: flex !important; flex-direction: column; align-items: center !important; width: 100% !important; }
+.st-key-hero_cta [data-testid="stElementContainer"], .st-key-end_cta [data-testid="stElementContainer"] { width: auto !important; align-self: center !important; }
 .st-key-hero_cta [data-testid="stPageLink"], .st-key-end_cta [data-testid="stPageLink"] { display: flex; justify-content: center; }
 .st-key-hero_cta [data-testid="stPageLink"] a, .st-key-end_cta [data-testid="stPageLink"] a {
   background: var(--accent); border: 2px solid var(--brut-border); border-radius: 16px;
@@ -205,7 +216,7 @@ html, body, .stApp { background: var(--bg) !important; }
 
 .kicker { font-size: .74rem; letter-spacing: .2em; text-transform: uppercase; font-weight: 800; color: var(--accent); }
 .section-title { font-size: clamp(2rem, 4.4vw, 3.6rem); font-weight: 800; letter-spacing: -.045em; line-height: 1.04; margin: 10px 0 14px; color: var(--text); }
-.section-sub { color: var(--muted); font-size: 1.05rem; max-width: 46rem; line-height: 1.75; font-weight: 500; }
+.section-sub { color: var(--muted); font-size: 1.05rem; max-width: 64rem; line-height: 1.75; font-weight: 500; }
 .center { text-align: center; margin-left: auto; margin-right: auto; }
 .label { font-size: .72rem; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
 .muted { color: var(--muted); }
@@ -280,37 +291,33 @@ html, body, .stApp { background: var(--bg) !important; }
 .feature .t { font-size: 1.45rem; font-weight: 800; letter-spacing: -.035em; margin: 8px 0 10px; }
 .feature .d { color: var(--muted); line-height: 1.7; font-size: .97rem; }
 
-/* ---------- 10. 홈: 3D 프리즘 슬랩 (빛이 4개의 유리를 통과) ---------- */
-.prism-wrap { padding: 40px 0 10px; perspective: 1400px; }
-.prism-row { position: relative; display: flex; justify-content: center; align-items: flex-start; gap: clamp(10px, 3vw, 40px); }
+/* ---------- 10. 홈: 3D 프리즘 카드 (마우스를 올린 카드가 정면으로 돌아섬) ---------- */
+.prism-wrap { padding: 40px 0 10px; }
+.prism-row { display: flex; justify-content: center; align-items: flex-start; gap: clamp(10px, 3vw, 40px); perspective: 1200px; }
 .slab {
   position: relative; width: clamp(68px, 18vw, 200px); aspect-ratio: 3 / 4; border-radius: 26px;
   background: linear-gradient(160deg, var(--glass-strong), var(--glass));
   border: 1px solid var(--glass-border);
   -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
   box-shadow: var(--shadow), inset 0 1px 0 var(--glass-highlight);
-  transform: rotateY(-34deg); transition: transform 1s var(--ease);
-  display: flex; flex-direction: column; justify-content: flex-end; padding: 16px;
+  transform: rotateY(-32deg);
+  transition: transform .8s var(--ease), box-shadow .8s var(--ease), border-color .8s var(--ease);
+  display: flex; flex-direction: column; justify-content: flex-end; padding: 16px; cursor: pointer;
 }
-.prism-wrap:hover .slab { transform: rotateY(-10deg); }
+.slab:hover {
+  transform: rotateY(0deg) translateY(-12px) scale(1.06);
+  border-color: var(--accent);
+  box-shadow: var(--shadow), var(--accent-glow), inset 0 1px 0 var(--glass-highlight);
+}
 .slab b { font-size: clamp(.8rem, 1.6vw, 1.05rem); font-weight: 800; letter-spacing: -.02em; }
 .slab i { font-style: normal; font-size: .76rem; color: var(--muted); margin-top: 4px; font-weight: 600; }
 .lens {
   position: absolute; width: 34%; aspect-ratio: 1; top: 22%; left: 33%; border-radius: 50%;
   background: conic-gradient(from 200deg, var(--irid-1), var(--irid-3), var(--irid-4), var(--irid-2), var(--irid-1));
   box-shadow: 0 0 30px var(--accent-soft), inset 0 2px 6px rgba(255,255,255,.55);
-  opacity: .9;
+  opacity: .9; transition: transform 1.2s var(--ease);
 }
-.beam {
-  position: absolute; left: 2%; right: 2%; top: 34.5%; height: 3px; border-radius: 3px; z-index: 2;
-  background: linear-gradient(90deg, transparent, var(--text) 8%, var(--accent) 40%, var(--neon) 75%, transparent);
-  box-shadow: 0 0 14px var(--accent), 0 0 36px var(--neon);
-  transform-origin: left center;
-}
-@supports (animation-timeline: view()) {
-  .beam { animation: beam linear both; animation-timeline: view(); animation-range: entry 30% cover 55%; }
-}
-@keyframes beam { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.slab:hover .lens { transform: rotate(180deg) scale(1.15); }
 
 /* ---------- 11. 아카데미: 레슨 & 퀴즈 ---------- */
 .lesson .no { font-size: 2.6rem; font-weight: 800; letter-spacing: -.06em; line-height: 1; -webkit-text-stroke: 1.5px var(--accent); color: transparent; }
@@ -412,6 +419,7 @@ html, body, .stApp { background: var(--bg) !important; }
 .term .d { color: var(--muted); line-height: 1.7; font-size: .94rem; }
 
 /* ---------- 15. 푸터 ---------- */
+.foot-title { display: inline-block; font-size: 1rem; font-weight: 800; letter-spacing: -.01em; color: var(--text); margin-bottom: 2px; }
 .foot { margin-top: 12vh; padding: 28px 0 10px; border-top: 1px solid var(--glass-border); display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; font-size: .8rem; color: var(--muted); font-weight: 600; line-height: 1.7; }
 
 /* ---------- 16. 모바일 ---------- */
