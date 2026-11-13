@@ -25,7 +25,9 @@ html, body, .stApp { background: var(--bg) !important; }
   font-family: var(--font) !important;
 }
 .stApp p, .stApp li, .stApp label { color: var(--text); font-weight: 500; }
-.mm, .mm * { word-break: keep-all; text-wrap: pretty; }
+/* 줄바꿈은 어절(띄어쓰기) 단위로 — 앱 전체 적용 */
+.stApp, .stApp * { word-break: keep-all; overflow-wrap: break-word; }
+.mm, .mm * { text-wrap: pretty; }
 .num { font-variant-numeric: tabular-nums; }
 ::selection { background: var(--accent); color: var(--on-accent); }
 
