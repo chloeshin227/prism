@@ -77,7 +77,7 @@ SLABS = [("손실 회피", "Loss Aversion"), ("군중 심리", "Herd · FOMO"), 
 render(
     '<div class="prism-wrap mm reveal"><div class="prism-row">'
     + "".join(f'<div class="slab"><span class="lens"></span><b>{k}</b><i>{e}</i></div>' for k, e in SLABS)
-    + '<div class="beam"></div></div></div>'
+    + "</div></div>"
 )
 
 spacer(16)
