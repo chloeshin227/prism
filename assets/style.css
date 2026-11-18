@@ -153,6 +153,7 @@ html, body, .stApp { background: var(--bg) !important; }
 
 /* CTA 링크 버튼 (네오 브루탈) */
 .st-key-hero_cta { margin: 26px 0 !important; } /* 위(티커)·아래(Scroll) 간격을 똑같이 */
+.st-key-end_cta { margin-top: 6vh !important; }
 .st-key-hero_cta, .st-key-end_cta { display: flex !important; flex-direction: column; align-items: center !important; width: 100% !important; }
 .st-key-hero_cta [data-testid="stElementContainer"], .st-key-end_cta [data-testid="stElementContainer"] { width: auto !important; align-self: center !important; }
 .st-key-hero_cta [data-testid="stPageLink"], .st-key-end_cta [data-testid="stPageLink"] { display: flex; justify-content: center; }
@@ -242,7 +243,7 @@ html, body, .stApp { background: var(--bg) !important; }
 .flat { color: var(--muted) !important; }
 
 /* ---------- 7. 홈: 히어로 ---------- */
-.hero { min-height: 74vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 4vh 0 0; }
+.hero { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 10vh 0 0; }
 .eyebrow { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; align-items: center; font-size: .78rem; letter-spacing: .18em; text-transform: uppercase; font-weight: 800; color: var(--muted); margin-bottom: 30px; }
 .hero-title { font-size: clamp(3.1rem, 10vw, 8.4rem); font-weight: 800; letter-spacing: -.06em; line-height: .94; color: var(--text); text-shadow: var(--title-glow); }
 .hero-title .grad { text-shadow: none; }
@@ -331,8 +332,13 @@ html, body, .stApp { background: var(--bg) !important; }
   .grid.lessons { grid-template-columns: 1fr; }
   .grid.lessons > .lesson, .grid.lessons > .lesson:nth-child(-n+2) { grid-column: auto; }
 }
-/* 퀴즈 보기 A·B / C·D 2x2 배열 */
-[class*="st-key-qopts_"] [data-testid="stRadio"] div[role="radiogroup"] { display: grid !important; grid-template-columns: 1fr 1fr; gap: 10px; }
+/* 퀴즈 보기 A·B / C·D 2x2 배열 — 칸 폭·높이를 똑같이 */
+[class*="st-key-qopts_"] [data-testid="stRadio"] div[role="radiogroup"] { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: stretch; }
+[class*="st-key-qopts_"] [data-testid="stRadio"] div[role="radiogroup"] > label { height: 100%; min-height: 78px; display: flex !important; align-items: center; }
+[class*="st-key-qopts_"] [data-testid="stRadio"] div[role="radiogroup"] > label:hover { transform: translateY(-3px); }
+/* 스크롤 이동용 보이지 않는 iframe은 자리를 차지하지 않게 */
+[data-testid="stElementContainer"]:has(iframe[height="0"]) { position: absolute; height: 0; overflow: hidden; }
+#anchor-quiz { scroll-margin-top: 110px; }
 @media (max-width: 520px) { [class*="st-key-qopts_"] [data-testid="stRadio"] div[role="radiogroup"] { grid-template-columns: 1fr; } }
 .lesson .no { font-size: 2.6rem; font-weight: 800; letter-spacing: -.06em; line-height: 1; color: var(--accent); }
 .lesson .t { font-size: 1.3rem; font-weight: 800; letter-spacing: -.03em; margin: 14px 0 2px; }
@@ -433,7 +439,7 @@ html, body, .stApp { background: var(--bg) !important; }
 
 /* ---------- 15. 푸터 ---------- */
 .foot-title { display: inline-block; font-size: 1rem; font-weight: 800; letter-spacing: -.01em; color: var(--text); margin-bottom: 2px; }
-.foot { margin-top: 12vh; padding: 28px 0 10px; border-top: 1px solid var(--glass-border); display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; font-size: .8rem; color: var(--muted); font-weight: 600; line-height: 1.7; }
+.foot { margin-top: 6vh; padding: 28px 0 10px; border-top: 1px solid var(--glass-border); display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; font-size: .8rem; color: var(--muted); font-weight: 600; line-height: 1.7; }
 
 /* ---------- 16. 모바일 ---------- */
 @media (max-width: 720px) {
