@@ -1,7 +1,9 @@
 """Academy — 레슨 카드 학습 → 확인 퀴즈 → 통과하면 Trading Floor 잠금 해제"""
+
 from html import escape
 
 import streamlit as st
+import streamlit.components.v1 as components
 
 from core.ui import render, section_head, spacer
 from data.lessons import LESSONS, QUIZ, PASS_SCORE
@@ -13,14 +15,22 @@ ss.setdefault("unlocked", False)
 LETTERS = "ABCD"
 
 
+def scroll_to(anchor_id):
+    """다음 화면이 그려진 뒤 해당 위치로 부드럽게 스크롤"""
+    components.html(
+        '<script>setTimeout(function(){var el=window.parent.document.getElementById("'
+        + anchor_id
+        + '");if(el){el.scrollIntoView({behavior:"smooth",block:"start"});}},250);</script>',
+        height=0,
+    )
+
+
 def grade_quiz():
-    ss.quiz_answers = {i: ss.get(f"quiz_{i}") for i in range(len(QUIZ))}
-    score = sum(ss.quiz_answers[i] == q["answer"] for i, q in enumerate(QUIZ))
-    if score >= PASS_SCORE:
-        ss.unlocked = True
+    ss.scroll_to = "anchor-quiz"
 
 
 def retry_quiz():
+    ss.scroll_to = "anchor-quiz"
     ss.quiz_answers = None
     for i in range(len(QUIZ)):
         ss.pop(f"quiz_{i}", None)
@@ -47,6 +57,8 @@ render(
 spacer(12)
 
 # ── 2. 퀴즈 ─────────────────────────────────────────────
+render('<div id="anchor-quiz"></div>')
+
 section_head(
     "Checkpoint",
     "이해했는지 확인해 볼까요?",
@@ -109,3 +121,7 @@ else:
             st.page_link("views/trade.py", label="Trading Floor 입장하기  →")
     else:
         st.button("↺  다시 풀기", on_click=retry_quiz)
+
+# 채점·재도전 직후 Checkpoint 제목 위치로 자동 스크롤
+if ss.get("scroll_to"):
+    scroll_to(ss.pop("scroll_to"))
