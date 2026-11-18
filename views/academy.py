@@ -34,7 +34,7 @@ section_head(
     "실제 게임에서 바로 쓰이는 개념만 골랐어요. 한 장에 1분이면 충분합니다.",
 )
 render(
-    '<div class="grid mm">'
+    '<div class="grid lessons mm">'
     + "".join(
         f'<div class="glass lift lesson reveal"><div class="no">{l["no"]}</div>'
         f'<div class="t">{l["title"]}</div><div class="en">{l["en"]}</div>'
@@ -63,14 +63,15 @@ if ss.quiz_answers is None:
             </div>
             """
         )
-        st.radio(
-            f"Q{i + 1}",
-            options=list(range(len(q["options"]))),
-            format_func=lambda k, q=q: f"{LETTERS[k]}.   {q['options'][k]}",
-            index=None,
-            key=f"quiz_{i}",
-            label_visibility="collapsed",
-        )
+        with st.container(key=f"qopts_{i}"):
+            st.radio(
+                f"Q{i + 1}",
+                options=list(range(len(q["options"]))),
+                format_func=lambda k, q=q: f"{LETTERS[k]}.   {q['options'][k]}",
+                index=None,
+                key=f"quiz_{i}",
+                label_visibility="collapsed",
+            )
     spacer(2)
     all_done = all(ss.get(f"quiz_{i}") is not None for i in range(len(QUIZ)))
     with st.container(key="grade"):
