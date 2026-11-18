@@ -337,28 +337,12 @@ html, body, .stApp { background: var(--bg) !important; }
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     grid-auto-rows: 90px !important;
     gap: 12px;
-    align-items: stretch;
-}
-
-/* 모든 선지 카드 동일한 크기 */
-[class*="st-key-qopts_"] [data-testid="stRadio"] div[role="radiogroup"] > label {
-    width: 100% !important;
-    height: 90px !important;
-    min-height: 90px !important;
-    max-height: 90px !important;
-    box-sizing: border-box !important;
-
-    display: flex !important;
-    align-items: center !important;
-    justify-content: flex-start !important;
-
-    overflow: hidden;
-}
-
-/* 마우스 호버 */
-[class*="st-key-qopts_"] [data-testid="stRadio"] div[role="radiogroup"] > label:hover {
-    transform: translateY(-3px);
-}
+    align-items: stretch; }
+/* 퀴즈 보기 A·B / C·D 2x2 배열 — 칸 폭·높이를 똑같이 */
+[class*="st-key-qopts_"] [data-testid="stRadio"] div[role="radiogroup"] { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: stretch; }
+[class*="st-key-qopts_"] [data-testid="stRadio"] div[role="radiogroup"] > label { height: 100%; min-height: 78px; display: flex !important; align-items: center; }
+[class*="st-key-qopts_"] [data-testid="stRadio"] div[role="radiogroup"] > label:hover { transform: translateY(-3px); }
+/* 스크롤 이동용 보이지 않는 iframe은 자리를 차지하지 않게 */
 [data-testid="stElementContainer"]:has(iframe[height="0"]) { position: absolute; height: 0; overflow: hidden; }
 #anchor-quiz { scroll-margin-top: 110px; }
 @media (max-width: 520px) { [class*="st-key-qopts_"] [data-testid="stRadio"] div[role="radiogroup"] { grid-template-columns: 1fr; } }
