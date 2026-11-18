@@ -152,6 +152,7 @@ html, body, .stApp { background: var(--bg) !important; }
 .st-key-commit button, .st-key-grade button { width: 100%; }
 
 /* CTA 링크 버튼 (네오 브루탈) */
+.st-key-hero_cta { margin: 26px 0 !important; } /* 위(티커)·아래(Scroll) 간격을 똑같이 */
 .st-key-hero_cta, .st-key-end_cta { display: flex !important; flex-direction: column; align-items: center !important; width: 100% !important; }
 .st-key-hero_cta [data-testid="stElementContainer"], .st-key-end_cta [data-testid="stElementContainer"] { width: auto !important; align-self: center !important; }
 .st-key-hero_cta [data-testid="stPageLink"], .st-key-end_cta [data-testid="stPageLink"] { display: flex; justify-content: center; }
@@ -241,7 +242,7 @@ html, body, .stApp { background: var(--bg) !important; }
 .flat { color: var(--muted) !important; }
 
 /* ---------- 7. 홈: 히어로 ---------- */
-.hero { min-height: 74vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 4vh 0 2vh; }
+.hero { min-height: 74vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 4vh 0 0; }
 .eyebrow { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; align-items: center; font-size: .78rem; letter-spacing: .18em; text-transform: uppercase; font-weight: 800; color: var(--muted); margin-bottom: 30px; }
 .hero-title { font-size: clamp(3.1rem, 10vw, 8.4rem); font-weight: 800; letter-spacing: -.06em; line-height: .94; color: var(--text); text-shadow: var(--title-glow); }
 .hero-title .grad { text-shadow: none; }
@@ -322,17 +323,27 @@ html, body, .stApp { background: var(--bg) !important; }
 .slab:hover .lens { transform: rotate(180deg) scale(1.15); }
 
 /* ---------- 11. 아카데미: 레슨 & 퀴즈 ---------- */
-.lesson .no { font-size: 2.6rem; font-weight: 800; letter-spacing: -.06em; line-height: 1; -webkit-text-stroke: 1.5px var(--accent); color: transparent; }
+/* 레슨 카드 5장: 윗줄 2장 + 아랫줄 3장 */
+.grid.lessons { grid-template-columns: repeat(6, 1fr); }
+.grid.lessons > .lesson { grid-column: span 2; }
+.grid.lessons > .lesson:nth-child(-n+2) { grid-column: span 3; }
+@media (max-width: 820px) {
+  .grid.lessons { grid-template-columns: 1fr; }
+  .grid.lessons > .lesson, .grid.lessons > .lesson:nth-child(-n+2) { grid-column: auto; }
+}
+/* 퀴즈 보기 A·B / C·D 2x2 배열 */
+[class*="st-key-qopts_"] [data-testid="stRadio"] div[role="radiogroup"] { display: grid !important; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media (max-width: 520px) { [class*="st-key-qopts_"] [data-testid="stRadio"] div[role="radiogroup"] { grid-template-columns: 1fr; } }
+.lesson .no { font-size: 2.6rem; font-weight: 800; letter-spacing: -.06em; line-height: 1; color: var(--accent); }
 .lesson .t { font-size: 1.3rem; font-weight: 800; letter-spacing: -.03em; margin: 14px 0 2px; }
 .lesson .en { font-size: .7rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
 .lesson .d { color: var(--muted); line-height: 1.75; font-size: .95rem; }
 .lesson .key { margin-top: 14px; padding: 12px 14px; border-radius: 14px; background: var(--accent-soft); font-weight: 700; font-size: .9rem; line-height: 1.55; }
-.q-card .q-no { font-size: 2.6rem; font-weight: 800; letter-spacing: -.06em; line-height: 1; -webkit-text-stroke: 1.5px var(--accent); color: transparent; }
+.q-card .q-no { font-size: 2.6rem; font-weight: 800; letter-spacing: -.06em; line-height: 1; color: var(--accent); }
 .q-card .q-text { font-size: 1.2rem; font-weight: 800; letter-spacing: -.03em; line-height: 1.45; margin-top: 10px; }
 .answered { margin-bottom: 14px; }
 .ans-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-.ans-head .q-mini { font-weight: 800; color: var(--muted); letter-spacing: .1em; font-size: .8rem; }
-.verdict { display: inline-flex; font-size: .68rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; padding: 5px 11px; border-radius: 999px; border: 2px solid var(--brut-border); white-space: nowrap; }
+.ans-head .q-mini { font-weight: 800; color: var(--accent); letter-spacing: .1em; font-size: 1rem; }.verdict { display: inline-flex; font-size: .68rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; padding: 5px 11px; border-radius: 999px; border: 2px solid var(--brut-border); white-space: nowrap; }
 .verdict.ok { background: var(--neon); color: #FFFFFF; box-shadow: 3px 3px 0 var(--brut-border); }
 .verdict.bad { background: var(--accent); color: var(--on-accent); box-shadow: 3px 3px 0 var(--brut-border); }
 .answered .q-text { font-size: 1.02rem; font-weight: 800; margin: 12px 0; line-height: 1.5; }
