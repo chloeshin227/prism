@@ -88,7 +88,7 @@ render(
     <div class="mm reveal center" style="text-align:center">
       <div class="kicker">Ready?</div>
       <div class="section-title">첫 번째 시장이<br><span class="grad">열립니다.</span></div>
-      <div class="section-sub center" style="margin-bottom:30px">한 판에 10–15분. 경제를 처음 공부하는 학생도 할 수 있도록 쉬운 말로 만들었어요.</div>
+      <div class="section-sub center" style="margin-bottom:0">한 판에 10–15분. 경제를 처음 공부하는 학생도 할 수 있도록 쉬운 말로 만들었어요.</div>
     </div>
     """
 )
