@@ -31,6 +31,7 @@ if not ss.unlocked:
         </div>
         """
     )
+    
     spacer(3)
 
     with st.container(key="end_cta"):
@@ -43,7 +44,10 @@ if not ss.unlocked:
             "학습 건너뛰고 바로 시작",
             on_click=skip_lessons
         )
+
     st.stop()
+
+
 
 # ── 1. 게임 종료 화면 ───────────────────────────────────
 if is_over(g):
