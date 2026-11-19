@@ -1,9 +1,6 @@
 """
 PRISM — Investment Simulator
 배우고(Academy) → 직접 투자하고(Trading Floor) → 습관을 되돌아보는(Report) 교육용 투자 시뮬레이션 게임
-
-이 파일이 앱의 '입구(entrypoint)'입니다.
-Streamlit Cloud에 배포할 때 Main file path에 main.py 를 적어주세요.
 """
 import streamlit as st
 
