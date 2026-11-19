@@ -32,12 +32,17 @@ if not ss.unlocked:
         """
     )
     spacer(3)
+
     with st.container(key="end_cta"):
-        st.page_link("views/academy.py", label="Academy로 가기  →")
-    spacer(2)
-    c = st.columns([1, 1, 1])[1]
-    with c:
-        st.button("학습 건너뛰고 바로 시작", on_click=skip_lessons)
+        st.page_link(
+            "views/academy.py",
+            label="Academy로 가기  →"
+        )
+
+        st.button(
+            "학습 건너뛰고 바로 시작",
+            on_click=skip_lessons
+        )
     st.stop()
 
 # ── 1. 게임 종료 화면 ───────────────────────────────────
