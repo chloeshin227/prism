@@ -155,6 +155,36 @@ html, body, .stApp { background: var(--bg) !important; }
 .st-key-hero_cta { margin: 26px 0 !important; } /* 위(티커)·아래(Scroll) 간격을 똑같이 */
 .st-key-end_cta { margin-top: 6vh !important; }
 .st-key-hero_cta, .st-key-end_cta { display: flex !important; flex-direction: column; align-items: center !important; width: 100% !important; }
+/* 잠금 화면 CTA 버튼 중앙 정렬 */
+.st-key-end_cta {
+    gap: 18px !important;
+}
+
+.st-key-end_cta [data-testid="stElementContainer"] {
+    width: auto !important;
+    align-self: center !important;
+}
+
+.st-key-end_cta [data-testid="stButton"] {
+    width: auto !important;
+}
+
+.st-key-end_cta [data-testid="stButton"] button {
+    width: auto !important;
+    white-space: nowrap;
+    background: var(--accent) !important;
+    color: var(--on-accent) !important;
+    border: 2px solid var(--brut-border) !important;
+    border-radius: 16px !important;
+    box-shadow: 6px 6px 0 var(--brut-shadow) !important;
+    padding: 12px 26px !important;
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.st-key-end_cta [data-testid="stButton"] button:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 8px 8px 0 var(--brut-shadow) !important;
+}
 .st-key-hero_cta [data-testid="stElementContainer"], .st-key-end_cta [data-testid="stElementContainer"] { width: auto !important; align-self: center !important; }
 .st-key-hero_cta [data-testid="stPageLink"], .st-key-end_cta [data-testid="stPageLink"] { display: flex; justify-content: center; }
 .st-key-hero_cta [data-testid="stPageLink"] a, .st-key-end_cta [data-testid="stPageLink"] a {
