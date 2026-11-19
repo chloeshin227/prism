@@ -26,6 +26,10 @@ def scroll_to(anchor_id):
 
 
 def grade_quiz():
+    ss.quiz_answers = {
+        i: ss.get(f"quiz_{i}")
+        for i in range(len(QUIZ))
+    }
     ss.scroll_to = "anchor-quiz"
 
 
