@@ -199,6 +199,40 @@ html, body, .stApp { background: var(--bg) !important; }
   color: var(--on-accent) !important; font-weight: 800 !important; font-size: 1.02rem !important;
 }
 
+/* Trading Floor 잠금 화면 버튼 중앙 정렬 */
+
+.st-key-end_cta {
+    width: 100% !important;
+    margin-top: 6vh !important;
+}
+
+.st-key-end_cta [data-testid="stVerticalBlock"] {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    width: 100% !important;
+}
+
+.st-key-end_cta [data-testid="stElementContainer"] {
+    width: fit-content !important;
+    align-self: center !important;
+}
+
+.st-key-end_cta [data-testid="stPageLink"] {
+    width: fit-content !important;
+    display: flex !important;
+    justify-content: center !important;
+}
+
+.st-key-end_cta [data-testid="stButton"] {
+    width: fit-content !important;
+}
+
+.st-key-end_cta [data-testid="stButton"] button {
+    width: auto !important;
+    white-space: nowrap !important;
+}
+
 /* ---------- 5. 입력 / 라디오 / 슬라이더 ---------- */
 .stApp [data-testid="stRadio"] div[role="radiogroup"] { gap: 10px; width: 100%; }
 .stApp [data-testid="stRadio"] div[role="radiogroup"] > label {
