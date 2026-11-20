@@ -569,3 +569,20 @@ html, body, .stApp { background: var(--bg) !important; }
     width: auto !important;
     white-space: nowrap !important;
 }
+
+/* Report 하단 CTA 중앙 정렬 */
+.st-key-report_end_cta {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+}
+
+.st-key-report_end_cta [data-testid="stElementContainer"],
+.st-key-report_end_cta [data-testid="stButton"] {
+    width: fit-content !important;
+}
+
+.st-key-report_end_cta button {
+    width: auto !important;
+    white-space: nowrap !important;
+}
