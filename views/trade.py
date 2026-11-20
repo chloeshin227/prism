@@ -14,10 +14,6 @@ ss.setdefault("unlocked", False)
 g = get_game()
 T = len(MONTHS)
 
-
-def skip_lessons():
-    ss.unlocked = True
-
 render('<div id="trade-top" class="page-head"></div>')
 
 if ss.pop("scroll_to_top", False):
@@ -52,19 +48,20 @@ if not ss.unlocked:
     
     spacer(3)
 
-    with st.container(key="end_cta"):
-        st.page_link(
-            "views/academy.py",
-            label="Academy로 가기  →"
-        )
+with st.container(key="end_cta"):
+    st.page_link(
+        "views/academy.py",
+        label="Academy로 가기  →"
+    )
 
-        st.button(
-            "학습 건너뛰고 바로 시작",
-            on_click=skip_lessons
-        )
+    if st.button(
+        "학습 건너뛰고 바로 시작",
+        key="skip_lessons_btn"
+    ):
+        ss.unlocked = True
+        st.rerun()
 
-    st.stop()
-
+st.stop()
 
 
 # ── 1. 게임 종료 화면 ───────────────────────────────────
