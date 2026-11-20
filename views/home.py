@@ -59,29 +59,47 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+
 # ── 1. HERO ──────────────────────────────────────────────
 tape = "".join(
     f'<span>{a["ticker"]} <b class="{"up" if RETURNS[0][a["id"]] >= 0 else "down"}">'
     f'{"▲" if RETURNS[0][a["id"]] >= 0 else "▼"}</b></span>'
     for a in ASSETS
 )
+
 render(
     f"""
     <section class="hero mm">
-      <div class="eyebrow"><span class="stamp">Season 01</span>Investment Simulation Game</div>
-      <div class="hero-title">Trade the market.<br><span class="grad">Train the mind.</span></div>
-      <div class="hero-sub">
+      <div class="eyebrow hero-reveal delay-1">
+        <span class="stamp">Season 01</span>
+        Investment Simulation Game
+      </div>
+
+      <div class="hero-title hero-reveal delay-2">
+        Trade the market.<br>
+        <span class="grad">Train the mind.</span>
+      </div>
+
+      <div class="hero-sub hero-reveal delay-3">
         가상의 1,000만 원으로 12개월을 투자해 보세요.
         매달 뉴스와 지표를 읽고 직접 결정하면, 시장은 그 선택에 반응합니다.
         게임이 끝나면 PRISM이 당신의 투자 습관을 비춰 드립니다.
       </div>
-      <div class="ticker-tape">{tape}</div>
+
+      <div class="ticker-tape hero-reveal delay-4">
+        {tape}
+      </div>
     </section>
     """
 )
+
 with st.container(key="hero_cta"):
     st.page_link("views/academy.py", label="Academy에서 시작하기  →")
-render('<div class="scroll-hint mm"><span></span>Scroll</div>')
+
+render(
+    '<div class="scroll-hint mm hero-reveal delay-5">'
+    '<span></span>Scroll</div>'
+)
 
 # ── 2. SCROLL STORY (화면 중앙 줄만 선명해지는 효과) ─────────
 STORY = [
