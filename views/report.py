@@ -80,8 +80,15 @@ else:
     cards = []
     for b in biases:
         badge = '<span class="verdict ok">Strength</span>' if b["kind"] == "good" else '<span class="verdict bad">Watch out</span>'
-        when = " · ".join(MONTHS[x]["label"] for x in b["months"])
-        when_html = f'<span class="chip">{when}</span>' if when else ""
+        when_html = (
+            '<div class="bias-months">'
+            + "".join(
+                f'<span class="chip">{MONTHS[x]["label"]}</span>'
+                for x in b["months"]
+            )
+            + '</div>'
+            if b["months"] else ""
+        )
         cards.append(
             f'<div class="glass lift bias"><div class="bias-head">{badge}{when_html}</div>'
             f'<div class="bias-name">{b["name"]}</div><div class="bias-en">{b["en"]}</div>'
