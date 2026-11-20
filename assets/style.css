@@ -541,3 +541,31 @@ html, body, .stApp { background: var(--bg) !important; }
 .grid:has(.bias) {
     align-items: stretch;
 }
+
+/* Trading Floor 종료 화면 CTA 중앙 정렬 */
+.st-key-trade_end_cta {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 14px !important;
+}
+
+.st-key-trade_end_cta [data-testid="stElementContainer"] {
+    width: fit-content !important;
+    align-self: center !important;
+}
+
+.st-key-trade_end_cta [data-testid="stPageLink"] {
+    display: flex !important;
+    justify-content: center !important;
+}
+
+.st-key-trade_end_cta [data-testid="stButton"] {
+    width: fit-content !important;
+}
+
+.st-key-trade_end_cta [data-testid="stButton"] button {
+    width: auto !important;
+    white-space: nowrap !important;
+}
