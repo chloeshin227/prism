@@ -48,7 +48,7 @@ PALETTES = {
     },
     # ───────── monochrome ON : 다크 모드 ─────────
     # charcoal black 주 배경 + royal blue 네온을 은은하게 + cherry-coke 핑크 포인트
-    # (오렌지가 더 좋으면 accent 를 "#FE8500" 로 바꾸세요)
+
     "dark": {
         "bg": "#21232E",            # charcoal black
         "bg-2": "#181922",
