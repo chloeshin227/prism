@@ -80,6 +80,7 @@ if is_over(g):
         </div>
         """
     )
+    
     spacer(3)
 
     with st.container(key="trade_end_cta"):
@@ -93,7 +94,7 @@ if is_over(g):
             on_click=reset_game
         )
 
-st.stop()
+    st.stop()
 
 # ── 2. 대시보드 ─────────────────────────────────────────
 m = g["turn"]
