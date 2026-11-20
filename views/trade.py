@@ -82,13 +82,19 @@ if is_over(g):
         """
     )
     spacer(3)
-    with st.container(key="end_cta"):
-        st.page_link("views/report.py", label="Report 보기  →")
-    spacer(2)
-    c = st.columns([1, 1, 1])[1]
-    with c:
-        st.button("↺  새 게임 시작", on_click=reset_game)
-    st.stop()
+
+    with st.container(key="trade_end_cta"):
+        st.page_link(
+            "views/report.py",
+            label="Report 보기  →"
+        )
+
+        st.button(
+            "↺  새 게임 시작",
+            on_click=reset_game
+        )
+
+st.stop()
 
 # ── 2. 대시보드 ─────────────────────────────────────────
 m = g["turn"]
