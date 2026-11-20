@@ -131,6 +131,10 @@ render(
 )
 
 spacer(4)
-c = st.columns([1, 1, 1])[1]
-with c:
-    st.button("↺  새 게임 시작", on_click=reset_game, type="primary")
+
+with st.container(key="report_end_cta"):
+    st.button(
+        "↺  새 게임 시작",
+        on_click=reset_game,
+        type="primary"
+    )
