@@ -2,6 +2,7 @@
 from html import escape
 
 import streamlit as st
+import streamlit.components.v1 as components
 
 from core.charts import line_chart, sparkline
 from core.game import get_game, advance, reset_game, total, is_over
@@ -17,8 +18,25 @@ T = len(MONTHS)
 def skip_lessons():
     ss.unlocked = True
 
+render('<div id="trade-top" class="page-head"></div>')
 
-render('<div class="page-head"></div>')
+if ss.pop("scroll_to_top", False):
+    components.html(
+        """
+        <script>
+        setTimeout(function() {
+            var el = window.parent.document.getElementById("trade-top");
+            if (el) {
+                el.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start"
+                });
+            }
+        }, 250);
+        </script>
+        """,
+        height=0,
+    )
 
 # ── 0. 잠금 화면 ────────────────────────────────────────
 if not ss.unlocked:
@@ -219,11 +237,16 @@ render(
     """
 )
 spacer(3)
+def advance_and_scroll(targets):
+    advance(targets)
+    ss.scroll_to_top = True
+
+
 with st.container(key="commit"):
     st.button(
         f"{month['label']} 확정  →  한 달 보내기" if not over else "비중 합계를 100% 이하로 맞춰 주세요",
         type="primary",
         disabled=over,
-        on_click=advance,
+        on_click=advance_and_scroll,
         args=(targets,),
     )
