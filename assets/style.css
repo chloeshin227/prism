@@ -516,3 +516,28 @@ html, body, .stApp { background: var(--bg) !important; }
   .slab i { display: none; }
   .ind { grid-template-columns: 1fr 1fr; }
 }
+
+/* 행동 편향 카드: 월 목록 줄바꿈 및 높이 통일 */
+.bias {
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.bias-months {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 4px;
+    max-width: 100%;
+}
+
+.bias-months .chip {
+    white-space: nowrap;
+    margin: 0;
+    font-size: .68rem;
+    padding: 4px 8px;
+}
+
+.grid:has(.bias) {
+    align-items: stretch;
+}
