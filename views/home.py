@@ -4,6 +4,61 @@ import streamlit as st
 from core.ui import render, section_head, spacer
 from data.market import ASSETS, RETURNS
 
+st.markdown(
+    """
+    <style>
+    @keyframes prismReveal {
+        from {
+            opacity: 0;
+            transform: translateY(16px);
+            filter: blur(5px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+            filter: blur(0);
+        }
+    }
+
+    .hero-reveal {
+        opacity: 0;
+        animation: prismReveal 0.8s cubic-bezier(.2,.7,.2,1) forwards;
+        will-change: transform, opacity;
+    }
+
+    .hero-reveal.delay-1 {
+        animation-delay: 0.08s;
+    }
+
+    .hero-reveal.delay-2 {
+        animation-delay: 0.22s;
+    }
+
+    .hero-reveal.delay-3 {
+        animation-delay: 0.36s;
+    }
+
+    .hero-reveal.delay-4 {
+        animation-delay: 0.50s;
+    }
+
+    .hero-reveal.delay-5 {
+        animation-delay: 0.64s;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .hero-reveal {
+            opacity: 1;
+            animation: none;
+            transform: none;
+            filter: none;
+        }
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 # ── 1. HERO ──────────────────────────────────────────────
 tape = "".join(
     f'<span>{a["ticker"]} <b class="{"up" if RETURNS[0][a["id"]] >= 0 else "down"}">'
