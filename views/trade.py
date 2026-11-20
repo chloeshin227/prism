@@ -1,4 +1,5 @@
 """Trading Floor — 매달 뉴스·지표를 보고 비중을 정하면 한 달이 흐르는 시뮬레이션"""
+
 from html import escape
 
 import streamlit as st
@@ -34,6 +35,7 @@ if ss.pop("scroll_to_top", False):
         height=0,
     )
 
+
 # ── 0. 잠금 화면 ────────────────────────────────────────
 if not ss.unlocked:
     render(
@@ -45,23 +47,23 @@ if not ss.unlocked:
         </div>
         """
     )
-    
+
     spacer(3)
 
-with st.container(key="end_cta"):
-    st.page_link(
-        "views/academy.py",
-        label="Academy로 가기  →"
-    )
+    with st.container(key="end_cta"):
+        st.page_link(
+            "views/academy.py",
+            label="Academy로 가기  →"
+        )
 
-    if st.button(
-        "학습 건너뛰고 바로 시작",
-        key="skip_lessons_btn"
-    ):
-        ss.unlocked = True
-        st.rerun()
+        if st.button(
+            "학습 건너뛰고 바로 시작",
+            key="skip_lessons_btn"
+        ):
+            ss.unlocked = True
+            st.rerun()
 
-st.stop()
+    st.stop()
 
 
 # ── 1. 게임 종료 화면 ───────────────────────────────────
