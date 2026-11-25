@@ -190,6 +190,5 @@ render(
 )
 
 spacer(4)
-c = st.columns([1, 1, 1])[1]
-with c:
+with st.container(key="center_btn"):
     st.button("↺  새 게임 시작 (시장 다시 고르기)", on_click=reset_game, type="primary")
