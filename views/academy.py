@@ -1,10 +1,10 @@
 """Academy — 레슨 카드 학습 → 확인 퀴즈 → 통과하면 Trading Floor 잠금 해제"""
-
 from html import escape
 
 import streamlit as st
 import streamlit.components.v1 as components
 
+from core.progress import add_xp, unlock, xp_strip_html
 from core.ui import render, section_head, spacer
 from data.lessons import LESSONS, QUIZ, PASS_SCORE
 
@@ -26,11 +26,16 @@ def scroll_to(anchor_id):
 
 
 def grade_quiz():
-    ss.quiz_answers = {
-        i: ss.get(f"quiz_{i}")
-        for i in range(len(QUIZ))
-    }
     ss.scroll_to = "anchor-quiz"
+    ss.quiz_answers = {i: ss.get(f"quiz_{i}") for i in range(len(QUIZ))}
+    score = sum(ss.quiz_answers[i] == q["answer"] for i, q in enumerate(QUIZ))
+    if score >= PASS_SCORE:
+        ss.unlocked = True
+        add_xp(50, key="quiz_pass", reason="퀴즈 통과")
+        unlock("quiz_pass")
+    if score == len(QUIZ):
+        add_xp(30, key="quiz_perfect", reason="퀴즈 만점")
+        unlock("perfect")
 
 
 def retry_quiz():
@@ -42,6 +47,8 @@ def retry_quiz():
 
 # ── 1. 레슨 ─────────────────────────────────────────────
 render('<div class="page-head"></div>')
+render(xp_strip_html())
+spacer(2)
 section_head(
     "Academy",
     "시장에 들어가기 전,<br>다섯 장의 카드.",
@@ -62,7 +69,6 @@ spacer(12)
 
 # ── 2. 퀴즈 ─────────────────────────────────────────────
 render('<div id="anchor-quiz"></div>')
-
 section_head(
     "Checkpoint",
     "이해했는지 확인해 볼까요?",
