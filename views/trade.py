@@ -2,6 +2,7 @@
 from html import escape
 
 import streamlit as st
+import streamlit.components.v1 as components
 
 from core.charts import line_chart, sparkline
 from core.game import (get_game, advance, reset_game, choose_scenario, sc, total, is_over,
@@ -20,6 +21,22 @@ g = get_game()
 def skip_lessons():
     ss.unlocked = True
 
+def commit_month(targets, pred):
+    """한 달 보내기 → 다음 화면은 맨 위부터 보이도록 표시"""
+    advance(targets, pred)
+    ss.scroll_top = True
+
+
+def scroll_top():
+    """화면이 새로 그려진 뒤 맨 위로 부드럽게 올라가기"""
+    components.html(
+        "<script>function up(){var d=window.parent.document;"
+        "var m=d.querySelector('[data-testid=\"stMain\"]');"
+        "if(m){m.scrollTo({top:0,behavior:'smooth'});}"
+        "d.documentElement.scrollTo({top:0,behavior:'smooth'});}"
+        "setTimeout(up,300);setTimeout(up,900);</script>",
+        height=0,
+    )
 
 def effect_text(o):
     """이벤트 보기가 만드는 제한을 한 줄로"""
@@ -35,9 +52,12 @@ def effect_text(o):
         parts.append(f"현금 최소 {o['cash_min']}%")
     return " · ".join(parts)
 
+if ss.pop("scroll_top", False):
+    scroll_top()
 
 render('<div class="page-head"></div>')
 render(xp_strip_html())
+
 spacer(2)
 
 # ── 0. 잠금 화면 ────────────────────────────────────────
@@ -55,8 +75,7 @@ if not ss.unlocked:
     with st.container(key="end_cta"):
         st.page_link("views/academy.py", label="Academy로 가기  →")
     spacer(2)
-    c = st.columns([1, 1, 1])[1]
-    with c:
+    with st.container(key="center_btn"):
         st.button("학습 건너뛰고 바로 시작", on_click=skip_lessons)
     st.stop()
 
@@ -113,8 +132,7 @@ if is_over(g):
     with st.container(key="end_cta"):
         st.page_link("views/report.py", label="Report 보기  →")
     spacer(2)
-    c = st.columns([1, 1, 1])[1]
-    with c:
+    with st.container(key="center_btn"):
         st.button("↺  새 게임 시작 (시장 다시 고르기)", on_click=reset_game)
     st.stop()
 
@@ -273,8 +291,7 @@ for a in ASSETS:
         <div class="ds">{escape(a['desc'])}</div>
         <div class="ds">보유 <b class="num">{won(held)}</b></div></div>"""
     )
-render('<div class="grid small mm">' + "".join(cards) + "</div>")
-
+render('<div class="grid assets mm">' + "".join(cards) + "</div>")
 spacer(8)
 
 # ── 7. 한 줄 예측 미니게임 ──────────────────────────────
