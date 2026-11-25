@@ -1,40 +1,44 @@
-"""Trading Floor — 매달 뉴스·지표를 보고 비중을 정하면 한 달이 흐르는 시뮬레이션"""
-
+"""Trading Floor — 시나리오를 고르고, 매달 뉴스·이벤트를 보고 비중을 정하면 한 달이 흐르는 시뮬레이션"""
 from html import escape
 
 import streamlit as st
-import streamlit.components.v1 as components
 
 from core.charts import line_chart, sparkline
-from core.game import get_game, advance, reset_game, total, is_over
+from core.game import (get_game, advance, reset_game, choose_scenario, sc, total, is_over,
+                       event_for, limits_for, answer_event, star_asset, finalize)
+from core.progress import profile, xp_strip_html
 from core.ui import render, section_head, spacer, won, pct, tone
-from data.market import ASSETS, MONTHS, RETURNS, PRICES, BENCH, START_CASH
+from data.events import STOCKS
+from data.market import ASSETS, ASSET_MAP, IDS, START_CASH
+from data.scenarios import SCENARIOS, SCENARIO_ORDER
 
 ss = st.session_state
 ss.setdefault("unlocked", False)
 g = get_game()
-T = len(MONTHS)
 
-render('<div id="trade-top" class="page-head"></div>')
 
-if ss.pop("scroll_to_top", False):
-    components.html(
-        """
-        <script>
-        setTimeout(function() {
-            var el = window.parent.document.getElementById("trade-top");
-            if (el) {
-                el.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start"
-                });
-            }
-        }, 250);
-        </script>
-        """,
-        height=0,
-    )
+def skip_lessons():
+    ss.unlocked = True
 
+
+def effect_text(o):
+    """이벤트 보기가 만드는 제한을 한 줄로"""
+    parts = []
+    if o["max"] and all(o["max"].get(a) == 0 for a in STOCKS):
+        parts.append("주식 비중 0% 고정")
+    elif o["max"] and len(o["max"]) == len(IDS) and len(set(o["max"].values())) == 1:
+        parts.append(f"한 자산 최대 {next(iter(o['max'].values()))}%")
+    else:
+        parts += [f"{ASSET_MAP[a]['ticker']} 최대 {v}%" for a, v in o["max"].items()]
+    parts += [f"{ASSET_MAP[a]['ticker']} 최소 {v}%" for a, v in o["min"].items()]
+    if o["cash_min"]:
+        parts.append(f"현금 최소 {o['cash_min']}%")
+    return " · ".join(parts)
+
+
+render('<div class="page-head"></div>')
+render(xp_strip_html())
+spacer(2)
 
 # ── 0. 잠금 화면 ────────────────────────────────────────
 if not ss.unlocked:
@@ -47,56 +51,74 @@ if not ss.unlocked:
         </div>
         """
     )
-
     spacer(3)
-
     with st.container(key="end_cta"):
-        st.page_link(
-            "views/academy.py",
-            label="Academy로 가기  →"
-        )
-
-        if st.button(
-            "학습 건너뛰고 바로 시작",
-            key="skip_lessons_btn"
-        ):
-            ss.unlocked = True
-            st.rerun()
-
+        st.page_link("views/academy.py", label="Academy로 가기  →")
+    spacer(2)
+    c = st.columns([1, 1, 1])[1]
+    with c:
+        st.button("학습 건너뛰고 바로 시작", on_click=skip_lessons)
     st.stop()
 
+# ── 1. 시나리오 고르기 ──────────────────────────────────
+if g["sid"] is None:
+    section_head(
+        "Choose your market",
+        "어떤 시장에서<br>시작할까요?",
+        "같은 기업, 다른 1년. 시장마다 성격과 함정이 달라요. 한 번 시작하면 12개월 동안 이 시장이 이어집니다.",
+    )
+    done = profile()["scenarios_done"]
+    cols = st.columns(3, gap="medium")
+    for col, sid in zip(cols, SCENARIO_ORDER):
+        S = SCENARIOS[sid]
+        with col:
+            stars = "★" * S["level"] + "☆" * (3 - S["level"])
+            learn = "".join(f'<span class="chip">{escape(x)}</span>' for x in S["learn"])
+            mark = '<span class="verdict ok">Cleared</span>' if sid in done else ""
+            render(
+                f"""
+                <div class="glass lift scn mm">
+                  <div class="scn-top"><span class="scn-lv">{stars}</span>{mark}</div>
+                  <div class="scn-name">{S['name']}</div>
+                  <div class="scn-en">{S['en']}</div>
+                  <div class="scn-line">{escape(S['tagline'])}</div>
+                  <div class="scn-learn">{learn}</div>
+                </div>
+                """
+            )
+            st.button("이 시장으로 시작  →", key=f"pick_{sid}", type="primary",
+                      on_click=choose_scenario, args=(sid,), use_container_width=True)
+    st.stop()
 
-# ── 1. 게임 종료 화면 ───────────────────────────────────
+S = sc(g)
+MONTHS, RETURNS, PRICES, BENCH = S["months"], S["returns"], S["prices"], S["bench"]
+T = len(MONTHS)
+
+# ── 2. 게임 종료 화면 ───────────────────────────────────
 if is_over(g):
+    finalize(g)
     final = total(g)
     render(
         f"""
         <div class="glass mm" style="text-align:center;padding:60px 30px">
-          <span class="stamp">Market Closed</span>
+          <span class="stamp">Market Closed · {S['name']}</span>
           <div class="section-title" style="margin-top:18px">12개월이 끝났습니다.</div>
           <div class="big-value num" style="margin:10px 0">{won(final)}</div>
           <div class="delta {tone(final / START_CASH - 1)}">{pct(final / START_CASH - 1)}</div>
-          <div class="section-sub center" style="margin-top:16px">이제 Report에서 나의 투자 습관을 확인해 보세요.</div>
+          <div class="section-sub center" style="margin-top:16px">이제 Report에서 나의 투자 캐릭터와 습관을 확인해 보세요.</div>
         </div>
         """
     )
-    
     spacer(3)
-
-    with st.container(key="trade_end_cta"):
-        st.page_link(
-            "views/report.py",
-            label="Report 보기  →"
-        )
-
-        st.button(
-            "↺  새 게임 시작",
-            on_click=reset_game
-        )
-
+    with st.container(key="end_cta"):
+        st.page_link("views/report.py", label="Report 보기  →")
+    spacer(2)
+    c = st.columns([1, 1, 1])[1]
+    with c:
+        st.button("↺  새 게임 시작 (시장 다시 고르기)", on_click=reset_game)
     st.stop()
 
-# ── 2. 대시보드 ─────────────────────────────────────────
+# ── 3. 대시보드 ─────────────────────────────────────────
 m = g["turn"]
 month = MONTHS[m]
 now = total(g)
@@ -106,7 +128,7 @@ render(
     f"""
     <div class="dash-top mm">
       <div>
-        <div class="kicker">Trading Floor</div>
+        <div class="kicker">Trading Floor · {S['name']}</div>
         <div class="month-pill" style="margin-top:10px"><b class="num">{m + 1:02d}</b><span>/ {T} · {month['label']}</span></div>
       </div>
       <div style="text-align:right">
@@ -157,7 +179,7 @@ with right:
 
 spacer(5)
 
-# ── 3. 이번 달 뉴스 ─────────────────────────────────────
+# ── 4. 이번 달 뉴스 ─────────────────────────────────────
 render(
     f"""
     <div class="news mm reveal">
@@ -168,6 +190,44 @@ render(
     """
 )
 
+# ── 5. 돌발 이벤트 카드 ─────────────────────────────────
+ev = event_for(g, m)
+choice_i = g["events"].get(m)
+pending = ev is not None and choice_i is None
+if ev is not None:
+    spacer(2)
+    if pending:
+        render(
+            f"""
+            <div class="event mm">
+              <span class="stamp hot">Event</span>
+              <div class="ev-title">{escape(ev['title'])}</div>
+              <div class="ev-body">{escape(ev['body'])}</div>
+              <div class="ev-hint">선택하면 이번 달 비중에 실제로 영향을 줘요.</div>
+            </div>
+            """
+        )
+        with st.container(key="evbtn"):
+            bcols = st.columns(len(ev["options"]), gap="medium")
+            for i, o in enumerate(ev["options"]):
+                with bcols[i]:
+                    st.button(o["label"], key=f"ev_{g['gid']}_{m}_{i}", on_click=answer_event,
+                              args=(m, i), use_container_width=True)
+    else:
+        o = ev["options"][choice_i]
+        eff = effect_text(o)
+        eff_html = f'<div class="ev-effect">적용 · {escape(eff)}</div>' if eff else ""
+        render(
+            f"""
+            <div class="event done mm">
+              <span class="stamp">Event · {escape(ev['title'])}</span>
+              <div class="ev-pick">나의 선택 — {escape(o['label'])}</div>
+              <div class="ev-body">{escape(o['result'])}</div>
+              {eff_html}
+            </div>
+            """
+        )
+
 # 지난달 결과
 if m > 0:
     last = RETURNS[m - 1]
@@ -176,19 +236,27 @@ if m > 0:
         for a in ASSETS
     )
     prev_ret = g["values"][-1] / g["values"][-2] - 1
+    pr = next((p for p in g["preds"] if p["month"] == m - 1), None)
+    pred_html = ""
+    if pr:
+        pa = ASSET_MAP[pr["asset"]]
+        verdict = "적중 +10 XP" if pr["correct"] else "빗나감"
+        pred_html = (f'<div class="muted" style="font-size:.88rem;margin-top:6px">예측 · {pa["ticker"]} '
+                     f'{"▲" if pr["guess"] == "up" else "▼"} → 실제 {pct(pr["ret"])} · <b>{verdict}</b></div>')
     render(
         f"""
         <div class="glass tight mm" style="margin-top:22px">
           <div class="label">Last month · {MONTHS[m - 1]['label']} — 내 포트폴리오 <b class="{tone(prev_ret)}">{pct(prev_ret)}</b></div>
           <div>{chips}</div>
           <div class="muted" style="font-size:.88rem;margin-top:6px;line-height:1.6">{escape(MONTHS[m - 1]['after'])}</div>
+          {pred_html}
         </div>
         """
     )
 
 spacer(7)
 
-# ── 4. 종목 카드 ────────────────────────────────────────
+# ── 6. 종목 카드 ────────────────────────────────────────
 section_head("Market", "오늘의 종목", "모든 기업은 가상의 기업입니다. 가격 흐름과 설명을 보고 판단해 보세요.")
 cards = []
 for a in ASSETS:
@@ -209,31 +277,65 @@ render('<div class="grid small mm">' + "".join(cards) + "</div>")
 
 spacer(8)
 
-# ── 5. 비중 정하기 ──────────────────────────────────────
+# ── 7. 한 줄 예측 미니게임 ──────────────────────────────
+star = star_asset(g, m)
+SA = ASSET_MAP[star]
+render(
+    f"""
+    <div class="glass mm" style="margin-bottom:14px">
+      <div class="kicker">Quick Call · 맞히면 +10 XP</div>
+      <div class="q-text" style="font-size:1.25rem;font-weight:800;letter-spacing:-.03em;margin-top:10px;line-height:1.5">
+        이번 달 뉴스의 열쇠는 <span class="grad">{SA['name']}</span>.<br>이 종목은 한 달 뒤 오를까요, 내릴까요?
+      </div>
+    </div>
+    """
+)
+with st.container(key="predict"):
+    guess = st.radio(
+        "예측", ["up", "down"], index=None, horizontal=True, key=f"pred_{g['gid']}_{m}",
+        format_func=lambda x: "▲  오른다" if x == "up" else "▼  내린다", label_visibility="collapsed",
+    )
+pred = {"asset": star, "guess": guess} if guess else None
+
+spacer(6)
+
+# ── 8. 비중 정하기 ──────────────────────────────────────
 section_head(
     "Your Move",
     f"{month['label']}의 포트폴리오",
     "각 자산에 전체 자산의 몇 %를 담을지 정하세요. 남는 비율은 현금(월 0.25% 이자)으로 남습니다. 비중을 바꾸면 사고판 금액의 0.2%가 거래 비용으로 나가요.",
 )
+mins, maxs, cash_min = limits_for(g, m)
+if ev is not None and not pending:
+    eff = effect_text(ev["options"][choice_i])
+    if eff:
+        render(f'<div class="mm" style="margin-bottom:14px"><span class="stamp hot">이벤트 적용</span>&nbsp;&nbsp;<b>{escape(eff)}</b></div>')
+
 targets = {}
 with st.container(key="alloc"):
     cols = st.columns(2, gap="large")
     for i, a in enumerate(ASSETS):
+        lo, hi = mins.get(a["id"], 0), maxs.get(a["id"], 100)
+        label = f"{a['name']}  ·  {a['ticker']}"
         with cols[i % 2]:
-            targets[a["id"]] = st.slider(
-                f"{a['name']}  ·  {a['ticker']}",
-                min_value=0, max_value=100, step=5,
-                value=int(g["targets"][a["id"]]),
-                format="%d%%",
-            )
+            if hi <= lo:
+                targets[a["id"]] = lo
+                st.slider(label, 0, 100, value=lo, step=5, format="%d%%", disabled=True, key=f"fix_{g['gid']}_{m}_{a['id']}")
+            else:
+                default = min(max(int(g["targets"][a["id"]]), lo), hi)
+                targets[a["id"]] = st.slider(label, min_value=lo, max_value=hi, step=5, value=default, format="%d%%")
 
 used = sum(targets.values())
+limit = 100 - cash_min
 cash_pct = 100 - used
-over = used > 100
+over = used > limit
 bar = "".join(
     f'<i style="width:{targets[a["id"]] / max(used, 100) * 100:.2f}%;background:{a["color"]}"></i>' for a in ASSETS
 )
-status = f"100%를 넘었어요 ({used}%)" if over else f"투자 {used}%  ·  현금 {cash_pct}%"
+if over:
+    status = f"투자 한도 {limit}%를 넘었어요 ({used}%)"
+else:
+    status = f"투자 {used}%  ·  현금 {cash_pct}%"
 render(
     f"""
     <div class="mm" style="margin-top:18px">
@@ -243,16 +345,11 @@ render(
     """
 )
 spacer(3)
-def advance_and_scroll(targets):
-    advance(targets)
-    ss.scroll_to_top = True
-
-
+if pending:
+    btn_label = "먼저 위의 돌발 상황에 답해 주세요"
+elif over:
+    btn_label = f"비중 합계를 {limit}% 이하로 맞춰 주세요"
+else:
+    btn_label = f"{month['label']} 확정  →  한 달 보내기"
 with st.container(key="commit"):
-    st.button(
-        f"{month['label']} 확정  →  한 달 보내기" if not over else "비중 합계를 100% 이하로 맞춰 주세요",
-        type="primary",
-        disabled=over,
-        on_click=advance_and_scroll,
-        args=(targets,),
-    )
+    st.button(btn_label, type="primary", disabled=over or pending, on_click=advance, args=(targets, pred))
