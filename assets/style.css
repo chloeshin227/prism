@@ -586,3 +586,24 @@ html, body, .stApp { background: var(--bg) !important; }
     width: auto !important;
     white-space: nowrap !important;
 }
+
+
+/* ---------- 17. 홈 배경 영상 ---------- */
+/* 영상: 화면 전체 뒤에 고정, 클릭은 통과 */
+[class*="st-key-bgvideo"] { position: fixed !important; inset: 0; width: 100vw !important; height: 100vh !important; z-index: -1; pointer-events: none; overflow: hidden; margin: 0 !important; padding: 0 !important; }
+[class*="st-key-bgvideo"] > *, [class*="st-key-bgvideo"] [data-testid="stElementContainer"], [class*="st-key-bgvideo"] [data-testid="stVideo"] { position: absolute !important; inset: 0; width: 100% !important; height: 100% !important; margin: 0 !important; }
+[class*="st-key-bgvideo"] video { width: 100% !important; height: 100% !important; object-fit: cover; pointer-events: none; }
+[class*="st-key-bgvideo"] video::-webkit-media-controls, [class*="st-key-bgvideo"] video::-webkit-media-controls-enclosure, [class*="st-key-bgvideo"] video::-webkit-media-controls-panel { display: none !important; -webkit-appearance: none; }
+/* 글자가 잘 읽히도록 배경색을 옅게 덮고, 영상 위에 필름 입자를 한 번 더 */
+[class*="st-key-bgvideo"]::before { content: ""; position: absolute; inset: 0; z-index: 1; background: var(--bg); opacity: .18; }
+[class*="st-key-bgvideo"]::after {
+  content: ""; position: absolute; inset: 0; z-index: 2;
+  background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.17'/%3E%3C/svg%3E");
+}
+/* 영상이 있을 때는 CSS 배경(무지갯빛 덩어리·골진 유리)을 꺼서 겹치지 않게 */
+.stApp:has([class*="st-key-bgvideo"])::before, .stApp:has([class*="st-key-bgvideo"])::after { display: none; }
+/* '동작 줄이기'를 켠 사용자에게는 영상 대신 기존 배경을 보여 줌 */
+@media (prefers-reduced-motion: reduce) {
+  [class*="st-key-bgvideo"] { display: none !important; }
+  .stApp:has([class*="st-key-bgvideo"])::before, .stApp:has([class*="st-key-bgvideo"])::after { display: block; }
+}
