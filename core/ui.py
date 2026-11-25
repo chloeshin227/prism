@@ -1,7 +1,10 @@
 """
 화면 곳곳에서 같이 쓰는 UI 도우미 함수 모음.
 """
+
+from pathlib import Path
 import streamlit as st
+import streamlit.components.v1 as components
 
 
 def render(html: str) -> None:
@@ -86,4 +89,26 @@ def footer() -> None:
           실제 투자 권유나 조언이 아닙니다.</div>
         </div>
         """
+    )
+
+ASSETS = Path(__file__).resolve().parent.parent / "assets"
+
+
+def background_video(mono: bool) -> None:
+    """모드에 맞는 배경 영상을 화면 전체 뒤에 깔아요. (assets/bg_light.mp4, assets/bg_dark.mp4)
+    영상 파일이 없으면 아무 일도 하지 않고, 기존 CSS 배경이 그대로 보여요."""
+    name = "bg_dark.mp4" if mono else "bg_light.mp4"
+    path = ASSETS / name
+    if not path.exists():
+        return
+    with st.container(key="bgvideo_dark" if mono else "bgvideo_light"):
+        st.video(str(path), loop=True, autoplay=True, muted=True)
+    # 휴대폰(특히 아이폰)에서도 전체화면으로 넘어가지 않고 배경에서 재생되도록 속성을 보강
+    components.html(
+        "<script>var n=0,t=setInterval(function(){var d=window.parent.document;"
+        "d.querySelectorAll('[class*=\"st-key-bgvideo\"] video').forEach(function(v){"
+        "v.setAttribute('playsinline','');v.setAttribute('muted','');v.muted=true;"
+        "if(v.paused){v.play().catch(function(){});}});"
+        "if(++n>20){clearInterval(t);}},300);</script>",
+        height=0,
     )
