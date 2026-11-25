@@ -1,7 +1,6 @@
 """홈 — 히어로, 스크롤 포커스 스토리, 진행 방식, 3D 프리즘, CTA"""
 import streamlit as st
-
-from core.ui import render, section_head, spacer
+from core.ui import render, section_head, spacer, background_video
 from data.market import ASSETS, RETURNS
 
 st.markdown(
@@ -59,6 +58,8 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+# ── 0. 배경 영상 (assets/bg_light.mp4 · bg_dark.mp4가 있을 때만) ──
+background_video(st.session_state.get("mono", False))
 
 # ── 1. HERO ──────────────────────────────────────────────
 tape = "".join(
