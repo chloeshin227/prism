@@ -82,9 +82,9 @@ render(
       </div>
 
       <div class="hero-sub hero-reveal delay-3">
-        가상의 1,000만 원으로 12개월을 투자해 보세요.
-        매달 뉴스와 지표를 읽고 직접 결정하면, 시장은 그 선택에 반응합니다.
-        게임이 끝나면 PRISM이 당신의 투자 습관을 비춰 드립니다.
+        <span> 가상의 1,000만 원으로 12개월을 투자해 보세요.
+        <span>매달 뉴스와 지표를 읽고 직접 결정하면, 시장은 그 선택에 반응합니다.
+        <span>게임이 끝나면 PRISM이 당신의 투자 습관을 비춰 드립니다.
       </div>
 
       <div class="ticker-tape hero-reveal delay-4">
