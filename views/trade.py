@@ -369,4 +369,4 @@ elif over:
 else:
     btn_label = f"{month['label']} 확정  →  한 달 보내기"
 with st.container(key="commit"):
-    st.button(btn_label, type="primary", disabled=over or pending, on_click=advance, args=(targets, pred))
+    st.button(btn_label, type="primary", disabled=over or pending, on_click=commit_month, args=(targets, pred))
