@@ -155,7 +155,7 @@ html, body, .stApp { background: var(--bg) !important; }
 .st-key-center_btn [data-testid="stElementContainer"] { width: auto !important; align-self: center !important; }
 
 /* CTA 링크 버튼 (네오 브루탈) */
-.st-key-hero_cta { margin: 38px 0 22px !important; }
+.st-key-hero_cta { margin: 38px 0 28px !important; }
 .st-key-end_cta { margin-top: 6vh !important; } /* 위(티커)·아래(Scroll) 간격을 똑같이 */
 .st-key-hero_cta, .st-key-end_cta { display: flex !important; flex-direction: column; align-items: center !important; width: 100% !important; }
 .st-key-hero_cta [data-testid="stElementContainer"], .st-key-end_cta [data-testid="stElementContainer"] { width: auto !important; align-self: center !important; }
@@ -260,7 +260,7 @@ html, body, .stApp { background: var(--bg) !important; }
 .hero-title { font-size: clamp(3.1rem, 10vw, 8.4rem); font-weight: 800; letter-spacing: -.06em; line-height: .94; color: var(--text); text-shadow: var(--title-glow); }
 .hero-title .grad { text-shadow: none; }
 .hero-sub { margin-top: 30px; max-width: 100%; text-align: center; color: var(--muted); font-size: 1.1rem; line-height: 1.8; font-weight: 500; }
-.hero-sub span { display: block; }.ticker-tape { margin-top: 34px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.hero-sub span { display: block; }.ticker-tape { margin-top: 28px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
 .ticker-tape span { font-size: .78rem; font-weight: 800; letter-spacing: .06em; padding: 7px 12px; border-radius: 999px; background: var(--glass-strong); border: 1px solid var(--glass-border); }
 .scroll-hint { margin-top: 0; display: flex; flex-direction: column; align-items: center; gap: 10px; font-size: .7rem; letter-spacing: .3em; font-weight: 800; color: var(--muted); text-transform: uppercase; }
 .scroll-hint span { width: 1px; height: 46px; background: linear-gradient(var(--text), transparent); animation: hint 2.2s var(--ease) infinite; transform-origin: top; }
@@ -546,3 +546,18 @@ html, body, .stApp { background: var(--bg) !important; }
   [class*="st-key-bgvideo"] { display: none !important; }
   .stApp:has([class*="st-key-bgvideo"])::before, .stApp:has([class*="st-key-bgvideo"])::after { display: block; }
 }
+
+/* ---------- 18. 프리즘 카드: 눌러서 뜻 보기 ---------- */
+.slab { user-select: none; -webkit-tap-highlight-color: transparent; }
+.prism-wrap[data-open="0"] .slab[data-i="0"], .prism-wrap[data-open="1"] .slab[data-i="1"],
+.prism-wrap[data-open="2"] .slab[data-i="2"], .prism-wrap[data-open="3"] .slab[data-i="3"] {
+  transform: rotateY(0deg) translateY(-12px) scale(1.06); border-color: var(--accent);
+  box-shadow: var(--shadow), var(--accent-glow), inset 0 1px 0 var(--glass-highlight);
+}
+.slab-info { display: none; max-width: 640px; margin: 34px auto 0; text-align: center; }
+.prism-wrap[data-open="0"] .slab-info[data-i="0"], .prism-wrap[data-open="1"] .slab-info[data-i="1"],
+.prism-wrap[data-open="2"] .slab-info[data-i="2"], .prism-wrap[data-open="3"] .slab-info[data-i="3"] { display: block; animation: infoIn .5s var(--ease); }
+@keyframes infoIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.si-name { font-size: 1.7rem; font-weight: 800; letter-spacing: -.04em; margin: 8px 0 12px; }
+.si-text { color: var(--muted); line-height: 1.8; font-size: 1rem; }
+.si-game { margin-top: 14px; padding: 12px 16px; border-radius: 14px; background: var(--accent-soft); font-weight: 700; font-size: .92rem; line-height: 1.6; }
