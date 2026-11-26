@@ -537,7 +537,7 @@ html, body, .stApp { background: var(--bg) !important; }
 [class*="st-key-bgvideo"]::before { content: ""; position: absolute; inset: 0; z-index: 1; background: var(--bg); opacity: .18; }
 [class*="st-key-bgvideo"]::after {
   content: ""; position: absolute; inset: 0; z-index: 2;
-  background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.17'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
 }
 /* 영상이 있을 때는 CSS 배경(무지갯빛 덩어리·골진 유리)을 꺼서 겹치지 않게 */
 .stApp:has([class*="st-key-bgvideo"])::before, .stApp:has([class*="st-key-bgvideo"])::after { display: none; }
