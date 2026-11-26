@@ -162,7 +162,7 @@ render(f'<div class="glass mm"><div class="timeline">{"".join(items)}</div></div
 
 # ── 5. 배지 ─────────────────────────────────────────────
 spacer(10)
-section_head("Badges", "모은 배지", "퀴즈, 선택, 예측, 완주로 배지를 모아 보세요. 아직 못 받은 배지는 흐리게 보여요.")
+section_head("Badges", "모은 배지", "퀴즈, 선택, 완주로 배지를 모아 보세요. 아직 못 받은 배지는 흐리게 보여요.")
 have = set(profile()["badges"])
 render(
     '<div class="grid small mm">'
