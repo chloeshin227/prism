@@ -3,6 +3,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 from core.ui import render, section_head, spacer, background_video
+from data.market import ASSETS, RETURNS
 
 st.markdown(
     """
