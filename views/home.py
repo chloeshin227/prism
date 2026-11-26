@@ -1,7 +1,8 @@
 """홈 — 히어로, 스크롤 포커스 스토리, 진행 방식, 3D 프리즘, CTA"""
 import streamlit as st
+import streamlit.components.v1 as components
+
 from core.ui import render, section_head, spacer, background_video
-from data.market import ASSETS, RETURNS
 
 st.markdown(
     """
@@ -144,14 +145,46 @@ spacer(14)
 section_head(
     "Behavioral Finance",
     "당신을 흔드는<br>네 개의 마음.",
-    "투자의 적은 시장의 변동성이 아니라, 그 앞에서 흔들리는 우리의 심리입니다. 카드 위에 마우스를 올려보세요.",
+    "투자의 적은 시장의 변동성이 아니라, 그 앞에서 흔들리는 우리의 심리입니다. 카드를 눌러 그 마음이 무엇인지 확인해 보세요.",
     center=True,
 )
-SLABS = [("손실 회피", "Loss Aversion"), ("군중 심리", "Herd · FOMO"), ("확증 편향", "Confirmation"), ("과잉 확신", "Overconfidence")]
+SLABS = [
+    ("손실 회피", "Loss Aversion",
+     "같은 크기라면 이익의 기쁨보다 손실의 아픔을 약 두 배 크게 느끼는 마음이에요. 그래서 떨어진 종목을 서둘러 팔아 버리거나, 손실을 확정하기 싫어 끝까지 붙들게 돼요.",
+     "게임에서는 급락한 달에 겁이 나서 팔았는데, 바로 다음 달 시장이 반등하는 모습으로 나타나요."),
+    ("군중 심리", "Herd · FOMO",
+     "다들 사니까, 이미 오르고 있으니까 따라 사는 마음이에요. 기회를 놓칠까 두려운 FOMO가 더해지면, 가격이 크게 오른 뒤에 뒤늦게 사기 쉬워요.",
+     "게임에서는 루머가 도는 종목이나 이미 많이 오른 종목을 뒤늦게 크게 사는 모습으로 나타나요."),
+    ("확증 편향", "Confirmation",
+     "내가 믿고 싶은 정보만 골라 보고, 반대되는 정보는 흘려 넘기는 마음이에요. 같은 기사 안에 경고가 있어도 좋은 소식만 기억해요.",
+     "게임에서는 신고가 소식에 집중하다가, 같은 뉴스에 숨어 있던 경고를 놓치는 모습으로 나타나요."),
+    ("과잉 확신", "Overconfidence",
+     "내 판단이 틀릴 수 있다는 사실을 잊는 마음이에요. 확신이 클수록 한 종목에 크게 걸게 되고, 틀렸을 때는 회복하기 어려워요.",
+     "게임에서는 한 자산에 비중 절반 이상을 몰아 넣는 모습으로 나타나요."),
+]
 render(
-    '<div class="prism-wrap mm reveal"><div class="prism-row">'
-    + "".join(f'<div class="slab"><span class="lens"></span><b>{k}</b><i>{e}</i></div>' for k, e in SLABS)
-    + "</div></div>"
+    '<div class="prism-wrap mm reveal" data-open=""><div class="prism-row">'
+    + "".join(
+        f'<div class="slab" data-i="{i}"><span class="lens"></span><b>{k}</b><i>{e}</i></div>'
+        for i, (k, e, _, _) in enumerate(SLABS)
+    )
+    + "</div>"
+    + "".join(
+        f'<div class="slab-info glass" data-i="{i}"><div class="kicker">{e}</div>'
+        f'<div class="si-name">{k}</div><div class="si-text">{d}</div><div class="si-game">→ {g}</div></div>'
+        for i, (k, e, d, g) in enumerate(SLABS)
+    )
+    + "</div>"
+)
+# 카드를 누르면 해당 설명이 열리고, 같은 카드를 다시 누르면 닫힘
+components.html(
+    "<script>(function(){var w=window.parent;if(w.__prismSlab){return;}w.__prismSlab=true;"
+    "w.document.addEventListener('click',function(e){"
+    "var s=e.target.closest&&e.target.closest('.slab');if(!s){return;}"
+    "var wrap=s.closest('.prism-wrap');if(!wrap){return;}"
+    "var i=s.getAttribute('data-i');"
+    "wrap.setAttribute('data-open',wrap.getAttribute('data-open')===i?'':i);});})();</script>",
+    height=0,
 )
 
 spacer(16)
