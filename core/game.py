@@ -23,7 +23,6 @@ def new_game(sid=None):
         "history": [],                           # 달마다의 기록
         "values": [float(START_CASH)],           # 월말 총자산 흐름
         "events": {},                            # {달: 고른 보기 번호}
-        "preds": [],                             # 예측 미니게임 기록
         "finalized": False,
     }
 
@@ -97,16 +96,8 @@ def answer_event(m, i):
     if sum(1 for _, f in event_flags(g) if f == "calm") >= 2:
         unlock("skeptic")
 
-
-# ── 예측 미니게임 ───────────────────────────────────────
-def star_asset(g, m):
-    """이번 달 가장 크게 움직이는 자산 — 예측 문제의 주인공"""
-    r = sc(g)["returns"][m]
-    return max(IDS, key=lambda a: abs(r[a]))
-
-
 # ── 한 달 진행 ──────────────────────────────────────────
-def advance(targets, pred=None):
+def advance(targets):
     """이번 달 비중(targets, %)대로 재조정 → 거래 비용 → 한 달 시장 움직임 반영"""
     g = get_game()
     if g["sid"] is None or is_over(g):
@@ -142,14 +133,6 @@ def advance(targets, pred=None):
     label = S["months"][m]["label"]
     add_xp(5, key=f"{g['gid']}_m{m}", reason=f"{label} 결정")
     unlock("first_step")
-
-    if pred:
-        went_up = R[pred["asset"]] > 0
-        ok = (pred["guess"] == "up") == went_up
-        g["preds"].append({"month": m, "asset": pred["asset"], "guess": pred["guess"], "ret": R[pred["asset"]], "correct": ok})
-        if ok:
-            add_xp(10, key=f"{g['gid']}_p{m}", reason="예측 적중")
-
 
 # ── 결과 분석 ───────────────────────────────────────────
 def max_drawdown(values):
@@ -329,9 +312,7 @@ def finalize(g):
         unlock("patient")
     if not any(b["kind"] == "warn" for b in biases):
         unlock("clean")
-    if sum(p["correct"] for p in g["preds"]) >= 8:
-        unlock("oracle")
-
+        
     p = profile()
     if g["sid"] not in p["scenarios_done"]:
         p["scenarios_done"].append(g["sid"])
