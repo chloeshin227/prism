@@ -61,9 +61,8 @@ with c2:
         (f"-{k['mdd'] * 100:.1f}%", "Max drawdown", "down" if k["mdd"] > 0 else ""),
         (won(k["fees"]), "Fees paid", ""),
     ]
-    if g["preds"]:
-        hits = sum(p["correct"] for p in g["preds"])
-        stats.append((f"{hits}/{len(g['preds'])}", "Prediction hits", ""))
+
+    
     render(
         '<div class="grid small mm">'
         + "".join(f'<div class="glass tight stat"><b class="num {c}">{v}</b><span>{lbl}</span></div>' for v, lbl, c in stats)
@@ -148,10 +147,7 @@ for h in g["history"]:
         o = ev["options"][g["events"][mo]]
         tag = f' ({FLAG_LABEL[o["flag"]]})' if o["flag"] else ""
         extra += f'<div class="tl-sub">이벤트 · {escape(ev["title"])} → <b>{escape(o["label"])}</b>{tag}</div>'
-    pr = next((p for p in g["preds"] if p["month"] == mo), None)
-    if pr:
-        extra += (f'<div class="tl-sub">예측 · {ASSET_MAP[pr["asset"]]["ticker"]} {"▲" if pr["guess"] == "up" else "▼"} '
-                  f'→ 실제 {pct(pr["ret"])} ({"적중" if pr["correct"] else "빗나감"})</div>')
+   
     items.append(
         f'<div class="tl-item{crit}"><div class="tl-time">{MONTHS[mo]["label"]} · <span class="{tone(r)}">{pct(r)}</span></div>'
         f'<div class="tl-text">{escape(MONTHS[mo]["headline"])}</div>'
