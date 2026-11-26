@@ -306,7 +306,7 @@ mins, maxs, cash_min = limits_for(g, m)
 if ev is not None and not pending:
     eff = effect_text(ev["options"][choice_i])
     if eff:
-        render(f'<div class="mm" style="margin-bottom:14px"><span class="stamp hot">이벤트 적용</span>&nbsp;&nbsp;<b>{escape(eff)}</b></div>')
+        render(f'<div class="mm" style="margin-bottom:14px;padding-left:28px"><span class="stamp hot">이벤트 적용</span>&nbsp;&nbsp;<b>{escape(eff)}</b></div>')
 
 targets = {}
 with st.container(key="alloc"):
