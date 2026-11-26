@@ -6,7 +6,7 @@ import streamlit.components.v1 as components
 
 from core.charts import line_chart, sparkline
 from core.game import (get_game, advance, reset_game, choose_scenario, sc, total, is_over,
-                       event_for, limits_for, answer_event, star_asset, finalize)
+                       event_for, limits_for, answer_event, finalize)
 from core.progress import profile, xp_strip_html
 from core.ui import render, section_head, spacer, won, pct, tone
 from data.events import STOCKS
@@ -23,7 +23,7 @@ def skip_lessons():
 
 def commit_month(targets, pred):
     """한 달 보내기 → 다음 화면은 맨 위부터 보이도록 표시"""
-    advance(targets, pred)
+    advance(targets)
     ss.scroll_top = True
 
 
@@ -141,7 +141,14 @@ m = g["turn"]
 month = MONTHS[m]
 now = total(g)
 ret = now / START_CASH - 1
-
+if m > 0:
+    prev_total = g["values"][-2]
+    mom = now / prev_total - 1
+    diff = now - prev_total
+    mom_html = (f'<div class="delta {tone(mom)} num" style="margin-top:4px">전월 대비 {"+" if diff >= 0 else "-"}{won(abs(diff))} ({pct(mom)})</div>')
+else:
+    mom_html = ""
+  
 render(
     f"""
     <div class="dash-top mm">
@@ -254,20 +261,13 @@ if m > 0:
         for a in ASSETS
     )
     prev_ret = g["values"][-1] / g["values"][-2] - 1
-    pr = next((p for p in g["preds"] if p["month"] == m - 1), None)
-    pred_html = ""
-    if pr:
-        pa = ASSET_MAP[pr["asset"]]
-        verdict = "적중 +10 XP" if pr["correct"] else "빗나감"
-        pred_html = (f'<div class="muted" style="font-size:.88rem;margin-top:6px">예측 · {pa["ticker"]} '
-                     f'{"▲" if pr["guess"] == "up" else "▼"} → 실제 {pct(pr["ret"])} · <b>{verdict}</b></div>')
+
     render(
         f"""
         <div class="glass tight mm" style="margin-top:22px">
           <div class="label">Last month · {MONTHS[m - 1]['label']} — 내 포트폴리오 <b class="{tone(prev_ret)}">{pct(prev_ret)}</b></div>
           <div>{chips}</div>
           <div class="muted" style="font-size:.88rem;margin-top:6px;line-height:1.6">{escape(MONTHS[m - 1]['after'])}</div>
-          {pred_html}
         </div>
         """
     )
@@ -294,29 +294,9 @@ for a in ASSETS:
 render('<div class="grid assets mm">' + "".join(cards) + "</div>")
 spacer(8)
 
-# ── 7. 한 줄 예측 미니게임 ──────────────────────────────
-star = star_asset(g, m)
-SA = ASSET_MAP[star]
-render(
-    f"""
-    <div class="glass mm" style="margin-bottom:14px">
-      <div class="kicker">Quick Call · 맞히면 +10 XP</div>
-      <div class="q-text" style="font-size:1.25rem;font-weight:800;letter-spacing:-.03em;margin-top:10px;line-height:1.5">
-        이번 달 뉴스의 열쇠는 <span class="grad">{SA['name']}</span>.<br>이 종목은 한 달 뒤 오를까요, 내릴까요?
-      </div>
-    </div>
-    """
-)
-with st.container(key="predict"):
-    guess = st.radio(
-        "예측", ["up", "down"], index=None, horizontal=True, key=f"pred_{g['gid']}_{m}",
-        format_func=lambda x: "▲  오른다" if x == "up" else "▼  내린다", label_visibility="collapsed",
-    )
-pred = {"asset": star, "guess": guess} if guess else None
+spacer(6) 
 
-spacer(6)
-
-# ── 8. 비중 정하기 ──────────────────────────────────────
+# ── 7. 비중 정하기 ──────────────────────────────────────
 section_head(
     "Your Move",
     f"{month['label']}의 포트폴리오",
@@ -369,4 +349,4 @@ elif over:
 else:
     btn_label = f"{month['label']} 확정  →  한 달 보내기"
 with st.container(key="commit"):
-    st.button(btn_label, type="primary", disabled=over or pending, on_click=commit_month, args=(targets, pred))
+    st.button(btn_label, type="primary", disabled=over or pending, on_click=commit_month, args=(targets,))
