@@ -163,6 +163,7 @@ render(
         <div class="label" style="margin:0 0 6px">Total Assets</div>
         <div class="big-value num">{won(now)}</div>
         <div class="delta {tone(ret)} num">{pct(ret)} <span class="muted">since start</span></div>
+        {mom_html}
       </div>
     </div>
     """
