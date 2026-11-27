@@ -45,8 +45,7 @@ def share_buttons(link: str, text: str) -> None:
     components.html(
         """
 <style>
-  body{margin:0;font-family:inherit}
-  .row{display:flex;gap:12px;flex-wrap:wrap}
+  body{margin:0;padding:6px 14px 8px 6px;font-family:inherit;overflow:hidden}  /* 그림자·눌림 효과가 잘리지 않도록 여백 */  .row{display:flex;gap:12px;flex-wrap:wrap}
   button{font:800 15px/1 'Helvetica Neue','Pretendard',sans-serif;padding:14px 22px;border-radius:14px;cursor:pointer;
          border:2px solid var(--t);background:var(--bg);color:var(--t);box-shadow:4px 4px 0 var(--s);transition:.15s}
   button.p{background:var(--a);color:var(--o)}
@@ -82,5 +81,5 @@ def share_buttons(link: str, text: str) -> None:
 })();
 </script>
 """.replace("__LINK__", link_js).replace("__TEXT__", text_js),
-        height=96,
+        height=116,
     )
