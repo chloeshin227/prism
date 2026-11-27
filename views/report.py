@@ -7,6 +7,7 @@ from core.character import meters, pick
 from core.charts import line_chart
 from core.game import get_game, reset_game, metrics, detect_biases, is_over, sc, finalize
 from core.progress import profile, xp_strip_html
+from core.share import make_link, share_buttons
 from core.ui import render, section_head, spacer, won, pct, tone
 from data.badges import BADGES
 from data.events import EVENTS, FLAG_LABEL
@@ -185,6 +186,17 @@ render(
     + "</div></div>"
 )
 
+# ── 결과 공유 ────────────────────────────────────────────
+spacer(4)
+_, ch_key = pick(g, biases)
+share_link = make_link(g["sid"], k["grade"], k["ret"], ch_key)
+share_text = f"PRISM에서 {S['name']} 시장을 {k['grade']}등급({pct(k['ret'])})으로 마쳤어요. 내 투자 캐릭터는 '{ch['name']}'! 너도 해 봐."
+section_head("Share", "결과 공유하기", "내 등급과 투자 캐릭터를 링크로 친구에게 보내 보세요. 링크를 연 친구는 내 결과를 보고 바로 도전할 수 있어요.")
+render(f'<div class="glass tight mm" style="margin-bottom:14px"><div class="label">공유 문구</div><div style="line-height:1.7">{escape(share_text)}</div></div>')
+share_buttons(share_link, share_text)
+st.code(share_link, language=None)
+
 spacer(4)
 with st.container(key="center_btn"):
     st.button("↺  새 게임 시작 (시장 다시 고르기)", on_click=reset_game, type="primary")
+    
