@@ -1,5 +1,18 @@
 """
-게임 엔진 — 시나리오, 포트폴리오 계산, 턴 진행, 돌발 이벤트, 예측, 투자 습관(편향) 분석.
+게임 엔진 — 시나리오, 포트폴리오 계산, 턴 진행, 돌발 이벤트, 투자 습관(편향) 분석, 경험치 정산.
+
+[이 파일의 구성]
+  1) 상태      : 게임 한 판의 데이터(new_game)와 불러오기·초기화
+  2) 돌발 이벤트 : 달마다 뜨는 선택지와 그 선택이 만드는 제한
+  3) 한 달 진행 : advance() — 비중 → 거래 비용 → 시장 수익률 반영
+  4) 결과 분석  : 수익률·최대 낙폭·등급, 투자 습관(행동 편향) 탐지
+  5) 정산      : 게임이 끝났을 때 XP와 배지를 한 번만 지급
+
+[예외 상황 처리 — 이 파일에서 막는 것들]
+  - 저장된 시나리오 번호가 잘못된 경우       → get_game()이 새 게임으로 되돌림
+  - 이벤트 제한을 어긴 비중 / 합계 100% 초과  → advance()가 보정·거부 (False 반환)
+  - 비중 값이 비어 있거나 숫자가 아닌 경우     → advance()의 try/except가 거부
+  - 총자산이 0이거나 기록이 비어 있는 경우    → max_drawdown()·metrics()가 0으로 안전 처리
 """
 import uuid
 
@@ -11,8 +24,9 @@ from data.market import IDS, START_CASH, FEE_RATE, CASH_RATE
 from data.scenarios import SCENARIOS
 
 
-# ── 상태 ────────────────────────────────────────────────
+# ── 1) 상태 ─────────────────────────────────────────────
 def new_game(sid=None):
+    """게임 한 판의 초기 상태를 만든다. sid는 고른 시나리오 번호(없으면 None)."""
     return {
         "gid": uuid.uuid4().hex[:8],             # 게임마다 다른 번호 (XP 중복 지급 방지)
         "sid": sid,                              # 고른 시나리오 (None이면 아직 안 고름)
@@ -28,16 +42,26 @@ def new_game(sid=None):
 
 
 def get_game():
-    if "game" not in st.session_state:
+    """지금 진행 중인 게임을 돌려준다. 없거나 데이터가 망가졌으면 새 게임으로 되돌린다. (예외 처리 ①)"""
+    g = st.session_state.get("game")
+    broken = (
+        not isinstance(g, dict)
+        or (g.get("sid") is not None and g["sid"] not in SCENARIOS)  # 존재하지 않는 시나리오
+    )
+    if broken:
         st.session_state.game = new_game()
     return st.session_state.game
 
 
 def reset_game():
+    """게임을 처음 상태로 되돌린다. (XP·배지는 유지)"""
     st.session_state.game = new_game()
 
 
 def choose_scenario(sid):
+    """시나리오를 골라 새 게임을 시작한다. 모르는 시나리오 번호는 무시한다."""
+    if sid not in SCENARIOS:
+        return
     st.session_state.game = new_game(sid)
 
 
@@ -47,15 +71,18 @@ def sc(g):
 
 
 def total(g):
+    """현금 + 모든 자산 보유 금액 = 지금 총자산"""
     return g["cash"] + sum(g["hold"].values())
 
 
 def is_over(g):
+    """12개월을 모두 보냈으면 True"""
     return g["sid"] is not None and g["turn"] >= len(sc(g)["months"])
 
 
-# ── 돌발 이벤트 ─────────────────────────────────────────
+# ── 2) 돌발 이벤트 ──────────────────────────────────────
 def event_for(g, m):
+    """m번째 달에 뜨는 이벤트(없으면 None)"""
     return EVENTS.get(g["sid"], {}).get(m)
 
 
@@ -75,7 +102,7 @@ def limits_for(g, m):
 
 
 def event_flags(g):
-    """[(달, 판단 유형), ...]"""
+    """이벤트에서 고른 보기들의 판단 유형을 [(달, 유형), ...]로 돌려준다. (편향 분석에 쓰임)"""
     out = []
     for m, i in g["events"].items():
         f = EVENTS[g["sid"]][m]["options"][i]["flag"]
@@ -85,9 +112,10 @@ def event_flags(g):
 
 
 def answer_event(m, i):
+    """이벤트 보기를 고른다. 이벤트가 없거나 이미 답했거나 보기 번호가 범위 밖이면 무시한다. (예외 처리 ②)"""
     g = get_game()
     ev = event_for(g, m)
-    if ev is None or m in g["events"]:
+    if ev is None or m in g["events"] or not (0 <= i < len(ev["options"])):
         return
     g["events"][m] = i
     flag = ev["options"][i]["flag"]
@@ -96,20 +124,27 @@ def answer_event(m, i):
     if sum(1 for _, f in event_flags(g) if f == "calm") >= 2:
         unlock("skeptic")
 
-# ── 한 달 진행 ──────────────────────────────────────────
+
+# ── 3) 한 달 진행 ───────────────────────────────────────
 def advance(targets):
-    """이번 달 비중(targets, %)대로 재조정 → 거래 비용 → 한 달 시장 움직임 반영"""
+    """이번 달 비중(targets, %)대로 재조정 → 거래 비용 → 한 달 시장 움직임 반영.
+    정상적으로 한 달이 진행되면 True, 입력이 잘못되어 거부하면 False를 돌려준다. (예외 처리 ③)"""
     g = get_game()
     if g["sid"] is None or is_over(g):
-        return
+        return False                       # 시나리오를 안 골랐거나 이미 끝난 게임
     S = sc(g)
     m = g["turn"]
 
+    # 이벤트가 정한 최소·최대 비중 안으로 값을 보정한다.
     mins, maxs, cash_min = limits_for(g, m)
-    targets = {a: int(min(max(targets[a], mins.get(a, 0)), maxs.get(a, 100))) for a in IDS}
+    try:
+        targets = {a: int(min(max(targets[a], mins.get(a, 0)), maxs.get(a, 100))) for a in IDS}
+    except (KeyError, TypeError, ValueError):
+        return False                       # 자산이 빠졌거나 숫자가 아닌 값
     if sum(targets.values()) > 100 - cash_min:
-        return
+        return False                       # 투자 합계가 한도(100% - 최소 현금)를 넘음
 
+    # 재조정: 목표 비중과 현재 보유의 차이(회전율)에 거래 비용률을 곱한 만큼 수수료를 낸다.
     start = total(g)
     wanted = {a: start * targets[a] / 100 for a in IDS}
     turnover = sum(abs(wanted[a] - g["hold"][a]) for a in IDS)
@@ -119,6 +154,7 @@ def advance(targets):
     hold = {a: after_fee * targets[a] / 100 for a in IDS}
     cash = after_fee - sum(hold.values())
 
+    # 이번 달 시장 수익률 반영 (현금은 월 이자)
     R = S["returns"][m]
     hold = {a: v * (1 + R[a]) for a, v in hold.items()}
     cash *= 1 + CASH_RATE
@@ -133,25 +169,32 @@ def advance(targets):
     label = S["months"][m]["label"]
     add_xp(5, key=f"{g['gid']}_m{m}", reason=f"{label} 결정")
     unlock("first_step")
+    return True
 
-# ── 결과 분석 ───────────────────────────────────────────
+
+# ── 4) 결과 분석 ────────────────────────────────────────
 def max_drawdown(values):
+    """최대 낙폭(MDD): 고점 대비 가장 크게 떨어진 비율. 값이 비었거나 고점이 0이면 0 (예외 처리 ④)"""
+    if not values:
+        return 0.0
     peak, mdd = values[0], 0.0
     for v in values:
         peak = max(peak, v)
-        mdd = max(mdd, (peak - v) / peak)
+        if peak > 0:                        # 0으로 나누기 방지
+            mdd = max(mdd, (peak - v) / peak)
     return mdd
 
 
 def metrics(g):
+    """수익률·벤치마크·최대 낙폭·수수료·등급(S/A/B/C)을 계산한다."""
     S = sc(g)
     final = g["values"][-1]
-    turns = g["turn"]
+    turns = min(g["turn"], len(S["bench"]) - 1)   # 벤치마크 범위를 벗어나지 않게
     ret = final / START_CASH - 1
     bench = S["bench"][turns] / START_CASH - 1
     mdd = max_drawdown(g["values"])
     fees = sum(h["fee"] for h in g["history"])
-    excess = ret - bench
+    excess = ret - bench                     # 시장(벤치마크)을 이긴 정도
     if excess >= 0.03 and mdd <= 0.12:
         grade = "S"
     elif excess >= 0:
@@ -291,8 +334,9 @@ def detect_biases(g):
     return found
 
 
-# ── 게임이 끝났을 때 한 번만: 경험치·배지 정산 ───────────────
+# ── 5) 게임이 끝났을 때 한 번만: 경험치·배지 정산 ────────────
 def finalize(g):
+    """12개월이 끝났을 때 딱 한 번 XP와 배지를 지급한다. (finalized 표시로 중복 지급 방지)"""
     if g.get("finalized") or not is_over(g):
         return
     g["finalized"] = True
@@ -312,7 +356,7 @@ def finalize(g):
         unlock("patient")
     if not any(b["kind"] == "warn" for b in biases):
         unlock("clean")
-        
+
     p = profile()
     if g["sid"] not in p["scenarios_done"]:
         p["scenarios_done"].append(g["sid"])
