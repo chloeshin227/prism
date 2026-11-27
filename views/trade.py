@@ -21,7 +21,7 @@ g = get_game()
 def skip_lessons():
     ss.unlocked = True
 
-def commit_month(targets, pred):
+def commit_month(targets):
     """한 달 보내기 → 다음 화면은 맨 위부터 보이도록 표시"""
     advance(targets)
     ss.scroll_top = True
