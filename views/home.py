@@ -2,6 +2,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
+from core.share import parse_shared
 from core.ui import render, section_head, spacer, background_video
 from data.market import ASSETS, RETURNS
 
@@ -62,6 +63,20 @@ st.markdown(
 
 # ── 0. 배경 영상 (assets/bg_light.mp4 · bg_dark.mp4가 있을 때만) ──
 background_video(st.session_state.get("mono", False))
+
+# ── 친구가 보낸 결과 링크로 들어왔을 때 (값이 올바를 때만 표시) ──
+shared = parse_shared(st.query_params)
+if shared:
+    from html import escape
+    from core.ui import pct
+    from data.scenarios import SCENARIOS
+    render(
+        f'<div class="glass mm" style="margin:90px auto -40px;max-width:760px;text-align:center">'
+        f'<span class="stamp">Friend\'s result</span>'
+        f'<div style="margin-top:14px;font-weight:800;font-size:1.25rem">친구가 {escape(SCENARIOS[shared["sid"]]["name"])} 시장에서 '
+        f'<span class="grad">{shared["grade"]}등급 · {pct(shared["ret"])}</span>를 받았어요</div>'
+        f'<div class="muted" style="margin-top:8px">투자 캐릭터는 \'{escape(shared["ch"]["name"])}\'. 당신은 어떤 투자자일까요?</div></div>'
+    )
 
 # ── 1. HERO ──────────────────────────────────────────────
 tape = "".join(
