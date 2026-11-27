@@ -163,21 +163,21 @@ SLABS = [
      "내 판단이 틀릴 수 있다는 사실을 잊는 마음이에요. 확신이 클수록 한 종목에 크게 걸게 되고, 틀렸을 때는 회복하기 어려워요.",
      "게임에서는 한 자산에 비중 절반 이상을 몰아 넣는 모습으로 나타나요."),
 ]
+# 카드를 누르면(포커스) 카드가 뒤집히며 뒷면에 뜻이 보임 — CSS만 사용(:focus)
 render(
-    '<div class="prism-wrap mm reveal" data-open=""><div class="prism-row">'
+    '<div class="prism-wrap mm reveal"><div class="prism-row">'
     + "".join(
-        f'<div class="slab" data-i="{i}"><span class="lens"></span><b>{k}</b><i>{e}</i></div>'
-        for i, (k, e, _, _) in enumerate(SLABS)
+        f'<div class="slab" tabindex="0">'
+        f'<div class="slab-in">'
+        f'<div class="face front"><span class="lens"></span><b>{k}</b><i>{e}</i></div>'
+        f'<div class="face back"><div class="kicker">{e}</div><div class="si-name">{k}</div>'
+        f'<p>{d}</p><div class="si-game">→ {g}</div></div>'
+        f'</div></div>'
+        for k, e, d, g in SLABS
     )
-    + "</div>"
-    + "".join(
-        f'<div class="slab-info glass" data-i="{i}"><div class="kicker">{e}</div>'
-        f'<div class="si-name">{k}</div><div class="si-text">{d}</div><div class="si-game">→ {g}</div></div>'
-        for i, (k, e, d, g) in enumerate(SLABS)
-    )
-    + "</div>"
+    + "</div></div>"
 )
-# 카드를 누르면 해당 설명이 열리고, 같은 카드를 다시 누르면 닫힘
+
 components.html(
     "<script>(function(){var w=window.parent;if(w.__prismSlab){return;}w.__prismSlab=true;"
     "w.document.addEventListener('click',function(e){"
