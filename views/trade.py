@@ -136,7 +136,7 @@ if is_over(g):
         st.page_link("views/report.py", label="Report 보기  →")
     spacer(2)
     with st.container(key="center_btn"):
-        st.button("↺  새 게임 시작 (시장 다시 고르기)", on_click=reset_game)
+        st.button("↺  새 게임 시작 (시장 다시 고르기)", on_click=reset_game, type="primary")
     st.stop()
 
 # ── 3. 대시보드 ─────────────────────────────────────────
