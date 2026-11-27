@@ -98,14 +98,14 @@ def background_video(mono: bool) -> None:
     """모드에 맞는 배경 영상을 화면 전체 뒤에 깔아요. (assets/bg_light.mp4, assets/bg_dark.mp4)
     영상 파일이 없으면 아무 일도 하지 않고, 기존 CSS 배경이 그대로 보여요."""
     name = "bg_dark.mp4" if mono else "bg_light.mp4"
-       path = ASSETS / name
-       if not path.exists():
-           return                              # 예외 처리 ⑤: 영상이 없어도 앱은 정상 동작
-       try:
-           with st.container(key="bgvideo_dark" if mono else "bgvideo_light"):
-               st.video(str(path), loop=True, autoplay=True, muted=True)
-       except Exception:                       # 예외 처리 ⑥: 영상을 못 읽어도 CSS 배경으로 대체
-           return
+    path = ASSETS / name
+    if not path.exists():
+        return                              # 예외 처리 ⑤: 영상이 없어도 앱은 정상 동작
+    try:
+        with st.container(key="bgvideo_dark" if mono else "bgvideo_light"):
+            st.video(str(path), loop=True, autoplay=True, muted=True)
+    except Exception:                       # 예외 처리 ⑥: 영상을 못 읽어도 CSS 배경으로 대체
+        return
     # 휴대폰(특히 아이폰)에서도 전체화면으로 넘어가지 않고 배경에서 재생되도록 속성을 보강
     components.html(
         "<script>var n=0,t=setInterval(function(){var d=window.parent.document;"
