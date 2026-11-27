@@ -561,3 +561,48 @@ html, body, .stApp { background: var(--bg) !important; }
 .si-name { font-size: 1.7rem; font-weight: 800; letter-spacing: -.04em; margin: 8px 0 12px; }
 .si-text { color: var(--muted); line-height: 1.8; font-size: 1rem; }
 .si-game { margin-top: 14px; padding: 12px 16px; border-radius: 14px; background: var(--accent-soft); font-weight: 700; font-size: .92rem; line-height: 1.6; }
+
+
+/* ---------- 19. 프리즘 카드: 눌러서 뒤집기 (앞면 = 이름, 뒷면 = 뜻) ---------- */
+.prism-row { gap: clamp(10px, 2.5vw, 36px); }
+.prism-row .slab {
+  position: relative; display: block; padding: 0; background: none; border: 0; box-shadow: none;
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+  width: clamp(140px, 17.5vw, 240px); aspect-ratio: 3 / 4.3;
+  transform: rotateY(-32deg); transform-style: preserve-3d;
+  outline: none; cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent;
+  transition: transform .8s var(--ease);
+}
+.prism-row .slab:hover, .prism-row .slab:focus { transform: rotateY(0deg) translateY(-12px) scale(1.04); }
+.slab-in { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform .8s var(--ease); }
+.prism-row .slab:focus .slab-in { transform: rotateY(180deg); }
+.face {
+  position: absolute; inset: 0; border-radius: 26px; padding: 16px;
+  -webkit-backface-visibility: hidden; backface-visibility: hidden;
+  background: linear-gradient(160deg, var(--glass-strong), var(--glass));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow), inset 0 1px 0 var(--glass-highlight);
+  display: flex; flex-direction: column;
+  transition: border-color .8s var(--ease), box-shadow .8s var(--ease);
+}
+.face.front { justify-content: flex-end; }
+.prism-row .slab:hover .face.front { border-color: var(--accent); box-shadow: var(--shadow), var(--accent-glow), inset 0 1px 0 var(--glass-highlight); }
+.face.back {
+  transform: rotateY(180deg); justify-content: center; text-align: center; gap: 4px; padding: 14px;
+  border-color: var(--accent); box-shadow: var(--shadow), var(--accent-glow), inset 0 1px 0 var(--glass-highlight);
+}
+.face.back .kicker { font-size: .62rem; margin: 0; }
+.face.back .si-name { font-size: 1.1rem; margin: 2px 0 6px; }
+.face.back p { font-size: .74rem; line-height: 1.55; margin: 0; color: var(--muted); }
+.face.back .si-game { font-size: .7rem; line-height: 1.5; padding: 8px 10px; margin-top: 8px; border-radius: 12px; }
+@media (max-width: 720px) {
+  .prism-row { flex-wrap: wrap; gap: 14px; perspective: 900px; }
+  .prism-row .slab { width: calc(50% - 8px); aspect-ratio: 3 / 4.9; transform: none; }
+  .prism-row .slab:hover, .prism-row .slab:focus { transform: none; }
+  .face { padding: 12px; border-radius: 20px; }
+  .face.front b { font-size: .95rem; }
+  .face.front i { font-size: .62rem; }
+  .face.back { padding: 10px; }
+  .face.back p { font-size: .68rem; }
+  .face.back .si-game { font-size: .64rem; padding: 6px 8px; }
+}
