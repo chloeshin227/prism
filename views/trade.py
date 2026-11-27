@@ -28,9 +28,12 @@ def commit_month(targets):
 
 
 def scroll_top():
-    """화면이 새로 그려진 뒤 맨 위로 부드럽게 올라가기"""
+    """화면이 새로 그려진 뒤 맨 위로 부드럽게 올라가기.
+    스크립트 내용이 매번 똑같으면 Streamlit이 같은 요소로 보고 다시 실행하지 않으므로,
+    호출할 때마다 번호(nonce)를 바꿔서 매번 새로 실행되게 한다."""
+    ss.scroll_n = ss.get("scroll_n", 0) + 1
     components.html(
-        "<script>function up(){var d=window.parent.document;"
+        "<script>/*" + str(ss.scroll_n) + "*/function up(){var d=window.parent.document;"
         "var m=d.querySelector('[data-testid=\"stMain\"]');"
         "if(m){m.scrollTo({top:0,behavior:'smooth'});}"
         "d.documentElement.scrollTo({top:0,behavior:'smooth'});}"
